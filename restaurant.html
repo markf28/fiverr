@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La Stella — Fine Italian Dining</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:      #c9a84c;
+      --gold-lt:   #e8c97a;
+      --gold-dk:   #9a7530;
+      --cream:     #faf8f3;
+      --cream-dk:  #f0ebe0;
+      --charcoal:  #1a1a1a;
+      --charcoal2: #2c2c2c;
+      --warm-gray: #6b6560;
+      --white:     #ffffff;
+      --section-gap: 7rem;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Jost', sans-serif;
+      color: var(--charcoal);
+      background: var(--cream);
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    /* ── UTILITY ── */
+    .gold { color: var(--gold); }
+    .italic { font-family: 'Cormorant Garamond', serif; font-style: italic; }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--cream); }
+    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 6%; height: 80px;
+      transition: background .4s, box-shadow .4s;
+    }
+
+    nav.scrolled {
+      background: rgba(26,26,26,.96);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 2px 40px rgba(0,0,0,.3);
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; font-weight: 600; letter-spacing: .12em;
+      color: var(--white); text-decoration: none;
+      display: flex; flex-direction: column; line-height: 1.1;
+    }
+
+    .nav-logo span {
+      font-size: .55rem; letter-spacing: .35em; text-transform: uppercase;
+      color: var(--gold); font-family: 'Jost', sans-serif; font-weight: 500;
+    }
+
+    .nav-links {
+      display: flex; gap: 2.5rem; list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none; color: rgba(255,255,255,.75);
+      font-size: .82rem; letter-spacing: .14em; text-transform: uppercase;
+      font-weight: 500; transition: color .2s;
+    }
+
+    .nav-links a:hover { color: var(--gold-lt); }
+
+    .nav-reserve {
+      border: 1px solid var(--gold); color: var(--gold);
+      padding: .55rem 1.5rem; font-size: .78rem; letter-spacing: .18em;
+      text-transform: uppercase; font-weight: 500; text-decoration: none;
+      transition: background .25s, color .25s;
+    }
+
+    .nav-reserve:hover { background: var(--gold); color: var(--charcoal); }
+
+    /* ── HERO ── */
+    #hero {
+      height: 100vh; min-height: 700px;
+      position: relative; display: flex; align-items: center;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(to right, rgba(10,8,5,.85) 0%, rgba(10,8,5,.5) 55%, rgba(10,8,5,.3) 100%),
+        url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1800&q=80') center/cover no-repeat;
+    }
+
+    /* fallback gradient when image fails */
+    .hero-bg::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #1a0f05 0%, #2d1a0a 40%, #1a0f05 100%);
+      z-index: -1;
+    }
+
+    .hero-content {
+      position: relative; z-index: 1;
+      padding: 0 6%; max-width: 760px;
+    }
+
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .hero-eyebrow::before, .hero-eyebrow::after {
+      content: ''; flex: 1; max-width: 50px;
+      height: 1px; background: var(--gold);
+    }
+
+    .hero-eyebrow span {
+      font-size: .72rem; letter-spacing: .3em; text-transform: uppercase;
+      color: var(--gold); font-weight: 500;
+    }
+
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.5rem, 8vw, 6.5rem);
+      font-weight: 300; line-height: 1.05;
+      color: var(--white); margin-bottom: 1.5rem;
+    }
+
+    h1 em { font-style: italic; color: var(--gold-lt); }
+
+    .hero-tagline {
+      font-size: 1rem; color: rgba(255,255,255,.65);
+      letter-spacing: .06em; max-width: 440px; margin-bottom: 3rem;
+      font-weight: 300;
+    }
+
+    .hero-btns { display: flex; gap: 1.2rem; flex-wrap: wrap; }
+
+    .btn-gold {
+      background: var(--gold); color: var(--charcoal);
+      padding: .9rem 2.5rem; font-size: .82rem;
+      letter-spacing: .2em; text-transform: uppercase; font-weight: 600;
+      text-decoration: none; transition: background .25s, transform .2s;
+      display: inline-block;
+    }
+
+    .btn-gold:hover { background: var(--gold-lt); transform: translateY(-2px); }
+
+    .btn-ghost {
+      border: 1px solid rgba(255,255,255,.4); color: var(--white);
+      padding: .9rem 2.5rem; font-size: .82rem;
+      letter-spacing: .2em; text-transform: uppercase; font-weight: 500;
+      text-decoration: none; transition: border-color .25s, background .25s, transform .2s;
+      display: inline-block;
+    }
+
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+
+    .hero-scroll {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: .5rem;
+      color: rgba(255,255,255,.4); font-size: .7rem; letter-spacing: .2em;
+      text-transform: uppercase; cursor: pointer; animation: bounce 2.5s infinite;
+    }
+
+    .hero-scroll svg { width: 20px; height: 20px; }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      display: flex; align-items: center; gap: 1.4rem;
+      justify-content: center; padding: 1rem 0;
+    }
+
+    .divider::before, .divider::after {
+      content: ''; flex: 1; max-width: 120px; height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold));
+    }
+
+    .divider::after { background: linear-gradient(to left, transparent, var(--gold)); }
+
+    .divider-icon { color: var(--gold); font-size: 1rem; }
+
+    /* ── STORY ── */
+    #story {
+      padding: var(--section-gap) 6%;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6rem;
+      max-width: 1300px; margin: 0 auto; align-items: center;
+    }
+
+    .story-images {
+      position: relative; height: 560px;
+    }
+
+    .story-img-main {
+      position: absolute; top: 0; left: 0;
+      width: 75%; height: 80%;
+      background: url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=900&q=80') center/cover;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+    }
+
+    .story-img-accent {
+      position: absolute; bottom: 0; right: 0;
+      width: 55%; height: 50%;
+      background: url('https://images.unsplash.com/photo-1551183053-bf91798d792f?w=700&q=80') center/cover;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+      border: 6px solid var(--cream);
+    }
+
+    .story-year {
+      position: absolute; top: 55%; left: 68%;
+      background: var(--charcoal); color: var(--gold);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.5rem; font-weight: 600; line-height: 1;
+      padding: 1.2rem 1.5rem;
+      writing-mode: vertical-rl; text-orientation: mixed;
+      letter-spacing: .1em;
+    }
+
+    .section-tag {
+      font-size: .72rem; letter-spacing: .3em; text-transform: uppercase;
+      color: var(--gold); font-weight: 500; margin-bottom: 1rem;
+      display: flex; align-items: center; gap: .8rem;
+    }
+
+    .section-tag::before {
+      content: ''; width: 30px; height: 1px; background: var(--gold);
+    }
+
+    h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      font-weight: 300; line-height: 1.15; color: var(--charcoal);
+      margin-bottom: 1.4rem;
+    }
+
+    h2 em { font-style: italic; color: var(--gold-dk); }
+
+    .story-text p {
+      font-size: .95rem; color: var(--warm-gray); margin-bottom: 1.2rem;
+      font-weight: 300; line-height: 1.85;
+    }
+
+    .story-sig {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-style: italic; color: var(--charcoal);
+      margin-top: 1.5rem; line-height: 1;
+    }
+
+    .story-sig span { font-size: .72rem; font-family: 'Jost', sans-serif; font-style: normal; letter-spacing: .15em; text-transform: uppercase; color: var(--warm-gray); display: block; margin-top: .3rem; }
+
+    /* ── MENU ── */
+    #menu {
+      background: var(--charcoal);
+      padding: var(--section-gap) 6%;
+    }
+
+    .menu-header {
+      text-align: center; max-width: 600px; margin: 0 auto 4rem;
+    }
+
+    .menu-header h2 { color: var(--white); }
+    .menu-header p { color: rgba(255,255,255,.5); font-size: .9rem; }
+
+    .menu-tabs {
+      display: flex; justify-content: center; gap: 0;
+      margin-bottom: 3.5rem; border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+
+    .menu-tab {
+      background: none; border: none; cursor: pointer;
+      padding: .8rem 2rem; font-family: 'Jost', sans-serif;
+      font-size: .78rem; letter-spacing: .2em; text-transform: uppercase;
+      color: rgba(255,255,255,.4); font-weight: 500;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+      transition: color .2s, border-color .2s;
+    }
+
+    .menu-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+    .menu-tab:hover:not(.active) { color: rgba(255,255,255,.7); }
+
+    .menu-panel { display: none; }
+    .menu-panel.active { display: block; }
+
+    .menu-grid {
+      max-width: 1000px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+    }
+
+    .menu-item {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 1rem; padding: 1.6rem 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      transition: background .2s;
+    }
+
+    .menu-item:hover { background: rgba(255,255,255,.03); }
+
+    .menu-item:nth-child(odd) { border-right: 1px solid rgba(255,255,255,.06); }
+
+    .menu-item-info { flex: 1; }
+
+    .menu-item-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem; font-weight: 400; color: var(--white);
+      margin-bottom: .25rem;
+    }
+
+    .menu-item-desc {
+      font-size: .8rem; color: rgba(255,255,255,.4); line-height: 1.6;
+      font-weight: 300;
+    }
+
+    .menu-item-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; color: var(--gold); font-weight: 600;
+      white-space: nowrap; padding-top: .1rem;
+    }
+
+    .menu-badge {
+      display: inline-block;
+      background: var(--gold); color: var(--charcoal);
+      font-size: .6rem; letter-spacing: .1em; text-transform: uppercase;
+      font-weight: 600; padding: .15rem .5rem;
+      margin-left: .5rem; vertical-align: middle;
+      font-family: 'Jost', sans-serif;
+    }
+
+    .menu-cta { text-align: center; margin-top: 3rem; }
+
+    /* ── EXPERIENCE ── */
+    #experience {
+      padding: var(--section-gap) 6%;
+      max-width: 1300px; margin: 0 auto;
+    }
+
+    .experience-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+      margin-top: 3.5rem;
+    }
+
+    .exp-card {
+      position: relative; overflow: hidden;
+      aspect-ratio: 3/4;
+      background: var(--charcoal2);
+    }
+
+    .exp-card-bg {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      transition: transform .6s ease;
+    }
+
+    .exp-card:hover .exp-card-bg { transform: scale(1.06); }
+
+    .exp-card-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,.82) 0%, rgba(0,0,0,.1) 60%);
+    }
+
+    .exp-card-content {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 2rem 1.8rem;
+    }
+
+    .exp-card-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem; font-weight: 300; color: var(--gold);
+      opacity: .35; line-height: 1; margin-bottom: .5rem;
+    }
+
+    .exp-card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 400; color: var(--white);
+      margin-bottom: .4rem;
+    }
+
+    .exp-card-desc {
+      font-size: .82rem; color: rgba(255,255,255,.6); font-weight: 300;
+    }
+
+    /* ── TESTIMONIALS ── */
+    #testimonials {
+      background: var(--charcoal);
+      padding: var(--section-gap) 6%;
+      text-align: center;
+    }
+
+    #testimonials h2 { color: var(--white); margin-bottom: .5rem; }
+    #testimonials .section-tag { justify-content: center; }
+    #testimonials .section-tag::before { display: none; }
+
+    .testimonials-track {
+      display: flex; gap: 2rem;
+      max-width: 1200px; margin: 3rem auto 0;
+      overflow: hidden;
+    }
+
+    .tcard {
+      flex: 0 0 calc(33.333% - 1.35rem);
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+      padding: 2.5rem 2rem; text-align: left;
+      transition: border-color .3s;
+    }
+
+    .tcard:hover { border-color: var(--gold); }
+
+    .tcard-stars { color: var(--gold); letter-spacing: 3px; font-size: .85rem; margin-bottom: 1.4rem; }
+
+    .tcard-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem; font-style: italic; font-weight: 300;
+      color: rgba(255,255,255,.85); line-height: 1.7; margin-bottom: 1.8rem;
+    }
+
+    .tcard-author { display: flex; align-items: center; gap: 1rem; }
+
+    .tcard-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem; font-weight: 600; color: var(--charcoal);
+      background: var(--gold); flex-shrink: 0;
+    }
+
+    .tcard-name { font-size: .85rem; font-weight: 500; color: var(--white); letter-spacing: .05em; }
+    .tcard-detail { font-size: .75rem; color: rgba(255,255,255,.35); letter-spacing: .08em; }
+
+    /* ── RESERVATION ── */
+    #reservation {
+      padding: var(--section-gap) 6%;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6rem;
+      max-width: 1200px; margin: 0 auto; align-items: start;
+    }
+
+    .res-info h2 { margin-bottom: 1rem; }
+
+    .res-info p {
+      font-size: .95rem; color: var(--warm-gray);
+      line-height: 1.8; margin-bottom: 2.5rem; font-weight: 300;
+    }
+
+    .res-detail {
+      display: flex; align-items: flex-start; gap: 1.2rem; margin-bottom: 1.6rem;
+    }
+
+    .res-icon {
+      width: 44px; height: 44px; border: 1px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0; color: var(--gold);
+    }
+
+    .res-label { font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: var(--warm-gray); font-weight: 500; }
+    .res-value { font-size: .95rem; color: var(--charcoal); font-weight: 400; line-height: 1.5; }
+
+    .res-form { display: flex; flex-direction: column; gap: 1.2rem; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+
+    .form-group { display: flex; flex-direction: column; gap: .45rem; }
+
+    label {
+      font-size: .7rem; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--warm-gray); font-weight: 500;
+    }
+
+    input, select, textarea {
+      background: transparent;
+      border: none; border-bottom: 1px solid var(--cream-dk);
+      padding: .7rem 0; font-size: .95rem; font-family: 'Jost', sans-serif;
+      color: var(--charcoal); outline: none;
+      transition: border-color .2s; font-weight: 300;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-bottom-color: var(--gold);
+    }
+
+    select { cursor: pointer; }
+    textarea { resize: none; height: 80px; }
+
+    .form-submit {
+      background: var(--charcoal); color: var(--white);
+      border: none; padding: 1.1rem; cursor: pointer;
+      font-family: 'Jost', sans-serif; font-size: .78rem;
+      letter-spacing: .25em; text-transform: uppercase; font-weight: 500;
+      transition: background .25s, transform .2s;
+      margin-top: .5rem;
+    }
+
+    .form-submit:hover { background: var(--gold); color: var(--charcoal); transform: translateY(-2px); }
+
+    .form-success {
+      display: none;
+      background: #f0f7f1; border-left: 3px solid #5a9e6f;
+      padding: 1rem 1.2rem; font-size: .88rem;
+      color: #2d6a4f; margin-bottom: 1rem; font-weight: 400;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #111; color: rgba(255,255,255,.45);
+      padding: 5rem 6% 2.5rem;
+    }
+
+    .footer-top {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 4rem;
+      padding-bottom: 4rem; border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 600; letter-spacing: .1em; color: var(--white);
+      display: block; margin-bottom: .3rem;
+    }
+
+    .footer-tagline {
+      font-size: .72rem; letter-spacing: .25em; color: var(--gold);
+      text-transform: uppercase; font-weight: 500; display: block; margin-bottom: 1.2rem;
+    }
+
+    .footer-brand p { font-size: .85rem; line-height: 1.8; max-width: 280px; }
+
+    footer h4 {
+      font-size: .72rem; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--white); font-weight: 500; margin-bottom: 1.4rem;
+    }
+
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: .75rem; }
+    .footer-links a { color: rgba(255,255,255,.45); text-decoration: none; font-size: .85rem; transition: color .2s; }
+    .footer-links a:hover { color: var(--gold); }
+
+    .footer-bottom {
+      max-width: 1200px; margin: 2rem auto 0;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: .75rem; flex-wrap: wrap; gap: 1rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 960px) {
+      #story { grid-template-columns: 1fr; gap: 3rem; }
+      .story-images { height: 380px; }
+      #reservation { grid-template-columns: 1fr; gap: 3rem; }
+      .experience-grid { grid-template-columns: 1fr 1fr; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+      .testimonials-track { flex-wrap: wrap; }
+      .tcard { flex: 0 0 100%; }
+    }
+
+    @media (max-width: 680px) {
+      .nav-links { display: none; }
+      .menu-grid { grid-template-columns: 1fr; }
+      .menu-item:nth-child(odd) { border-right: none; }
+      .form-row { grid-template-columns: 1fr; }
+      .experience-grid { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+      .menu-tab { padding: .8rem 1rem; font-size: .7rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav id="mainNav">
+  <a href="#" class="nav-logo">
+    La Stella
+    <span>Ristorante Italiano</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#story">Our Story</a></li>
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#reservation">Contact</a></li>
+  </ul>
+  <a href="#reservation" class="nav-reserve">Reserve a Table</a>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span>Est. 1987 · Milano &amp; New York</span>
+    </div>
+    <h1>Where <em>Italy</em><br/>Comes Alive</h1>
+    <p class="hero-tagline">
+      An intimate journey through the flavors of Northern Italy — crafted with heritage recipes, seasonal ingredients, and quiet elegance.
+    </p>
+    <div class="hero-btns">
+      <a href="#reservation" class="btn-gold">Reserve a Table</a>
+      <a href="#menu" class="btn-ghost">Explore the Menu</a>
+    </div>
+  </div>
+  <a href="#story" class="hero-scroll" aria-label="Scroll down">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    Scroll
+  </a>
+</section>
+
+<!-- ── STORY ── -->
+<section id="story">
+  <div class="story-images">
+    <div class="story-img-main"></div>
+    <div class="story-img-accent"></div>
+    <div class="story-year">1987</div>
+  </div>
+  <div class="story-text">
+    <div class="section-tag">Our Story</div>
+    <h2>A Family Tradition<br/><em>Across Generations</em></h2>
+    <p>La Stella was born from a single belief: that the finest Italian cooking is an act of love. Founded by Chef Marco Ferretti in 1987 after a decade in the kitchens of Milan and Florence, our restaurant has remained a family affair — his daughter Sofia now leads the kitchen, weaving her own creative voice into dishes you'll recognise from the first bite.</p>
+    <p>Every plate tells a story. Our pasta is rolled each morning. Our sauces simmer for hours. Our produce arrives from the same family farms it always has. This is not convenience cooking — it is a devotion to craft, passed from hand to hand.</p>
+    <div class="divider" style="justify-content:flex-start;margin-top:2rem;">
+      <div class="divider-icon">✦</div>
+    </div>
+    <div class="story-sig">
+      Sofia Ferretti
+      <span>Executive Chef &amp; Co-Owner</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── MENU ── -->
+<section id="menu">
+  <div class="menu-header">
+    <div class="section-tag" style="justify-content:center;">
+      <span style="margin-left:-.2rem;">Seasonal Menu</span>
+    </div>
+    <h2 style="color:#fff;">Crafted with <em style="color:var(--gold-lt);">Purpose</em></h2>
+    <p>Our menu changes with the seasons. These are current highlights — ask your server about tonight's specials.</p>
+  </div>
+
+  <div class="menu-tabs">
+    <button class="menu-tab active" onclick="switchTab(this,'antipasti')">Antipasti</button>
+    <button class="menu-tab" onclick="switchTab(this,'primi')">Primi Piatti</button>
+    <button class="menu-tab" onclick="switchTab(this,'secondi')">Secondi</button>
+    <button class="menu-tab" onclick="switchTab(this,'dolci')">Dolci</button>
+  </div>
+
+  <!-- ANTIPASTI -->
+  <div class="menu-panel active" id="antipasti">
+    <div class="menu-grid">
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Burrata con Pomodori <span class="menu-badge">Chef's Pick</span></div>
+          <div class="menu-item-desc">Creamy burrata, heirloom tomato, Sicilian basil oil, aged balsamic</div>
+        </div>
+        <div class="menu-item-price">$22</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Carpaccio di Manzo</div>
+          <div class="menu-item-desc">Thinly sliced wagyu beef, truffle aioli, Parmigiano Reggiano, capers</div>
+        </div>
+        <div class="menu-item-price">$28</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Polpo alla Griglia</div>
+          <div class="menu-item-desc">Chargrilled octopus, white bean purée, 'nduja, lemon</div>
+        </div>
+        <div class="menu-item-price">$26</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Tagliere della Casa</div>
+          <div class="menu-item-desc">Selection of cured meats, aged cheeses, house pickles, focaccia</div>
+        </div>
+        <div class="menu-item-price">$34</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Zuppa di Funghi <span class="menu-badge">Vegetarian</span></div>
+          <div class="menu-item-desc">Wild mushroom velouté, truffle cream, crispy sage</div>
+        </div>
+        <div class="menu-item-price">$18</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Cozze al Vino Bianco</div>
+          <div class="menu-item-desc">PEI mussels, white wine, garlic, fennel, toasted sourdough</div>
+        </div>
+        <div class="menu-item-price">$24</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIMI -->
+  <div class="menu-panel" id="primi">
+    <div class="menu-grid">
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Tagliatelle al Ragù <span class="menu-badge">Signature</span></div>
+          <div class="menu-item-desc">Egg tagliatelle, 8-hour Bolognese, Parmigiano, fresh herbs</div>
+        </div>
+        <div class="menu-item-price">$36</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Risotto ai Funghi Porcini</div>
+          <div class="menu-item-desc">Carnaroli rice, dried porcini, Grana Padano, white truffle oil</div>
+        </div>
+        <div class="menu-item-price">$38</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Cacio e Pepe</div>
+          <div class="menu-item-desc">Tonnarelli pasta, aged Pecorino Romano, Tellicherry black pepper</div>
+        </div>
+        <div class="menu-item-price">$32</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Pappardelle all'Anatra</div>
+          <div class="menu-item-desc">Wide ribbon pasta, slow-braised duck, rosemary, orange zest</div>
+        </div>
+        <div class="menu-item-price">$40</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Gnocchi al Gorgonzola <span class="menu-badge">Vegetarian</span></div>
+          <div class="menu-item-desc">Potato gnocchi, gorgonzola dolce, toasted walnuts, honey</div>
+        </div>
+        <div class="menu-item-price">$34</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Linguine alle Vongole</div>
+          <div class="menu-item-desc">Littleneck clams, white wine, garlic, chili, flat-leaf parsley</div>
+        </div>
+        <div class="menu-item-price">$38</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECONDI -->
+  <div class="menu-panel" id="secondi">
+    <div class="menu-grid">
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Costata di Manzo <span class="menu-badge">Signature</span></div>
+          <div class="menu-item-desc">Dry-aged ribeye, rosemary jus, roasted bone marrow, gremolata</div>
+        </div>
+        <div class="menu-item-price">$68</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Branzino al Forno</div>
+          <div class="menu-item-desc">Whole roasted sea bass, capers, olives, cherry tomato, lemon</div>
+        </div>
+        <div class="menu-item-price">$52</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Agnello alla Scottadito</div>
+          <div class="menu-item-desc">Grilled lamb chops, salsa verde, white bean, roasted garlic</div>
+        </div>
+        <div class="menu-item-price">$58</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Pollo alla Milanese</div>
+          <div class="menu-item-desc">Crispy breaded chicken, arugula, shaved Parmigiano, lemon</div>
+        </div>
+        <div class="menu-item-price">$44</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Vitello Saltimbocca</div>
+          <div class="menu-item-desc">Veal scallopini, prosciutto, sage, Marsala wine sauce</div>
+        </div>
+        <div class="menu-item-price">$54</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Melanzana alla Parmigiana <span class="menu-badge">Vegetarian</span></div>
+          <div class="menu-item-desc">Layered aubergine, San Marzano tomato, mozzarella fior di latte</div>
+        </div>
+        <div class="menu-item-price">$36</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOLCI -->
+  <div class="menu-panel" id="dolci">
+    <div class="menu-grid">
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Tiramisù della Casa <span class="menu-badge">Classic</span></div>
+          <div class="menu-item-desc">Our grandmother's recipe — mascarpone, espresso, Savoiardi, cocoa</div>
+        </div>
+        <div class="menu-item-price">$16</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Panna Cotta al Caramello</div>
+          <div class="menu-item-desc">Vanilla panna cotta, salted caramel, candied hazelnuts</div>
+        </div>
+        <div class="menu-item-price">$14</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Cannoli Siciliani</div>
+          <div class="menu-item-desc">Fried pastry shells, ricotta, candied orange, dark chocolate</div>
+        </div>
+        <div class="menu-item-price">$15</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Gelato Artigianale</div>
+          <div class="menu-item-desc">Three scoops of house-made gelato — ask your server for today's flavours</div>
+        </div>
+        <div class="menu-item-price">$12</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Torta al Cioccolato</div>
+          <div class="menu-item-desc">Warm dark chocolate fondant, Amarena cherry, crème fraîche</div>
+        </div>
+        <div class="menu-item-price">$16</div>
+      </div>
+      <div class="menu-item">
+        <div class="menu-item-info">
+          <div class="menu-item-name">Formaggi Italiani</div>
+          <div class="menu-item-desc">Selection of three Italian cheeses, honeycomb, walnut, quince</div>
+        </div>
+        <div class="menu-item-price">$24</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-cta">
+    <a href="#reservation" class="btn-gold" style="margin-top:1rem;">Reserve Your Evening</a>
+  </div>
+</section>
+
+<!-- ── EXPERIENCE ── -->
+<section id="experience">
+  <div class="section-tag">The La Stella Experience</div>
+  <h2>Every Detail,<br/><em>Considered</em></h2>
+  <div class="experience-grid">
+    <div class="exp-card">
+      <div class="exp-card-bg" style="background-image:url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80')"></div>
+      <div class="exp-card-overlay"></div>
+      <div class="exp-card-content">
+        <div class="exp-card-num">01</div>
+        <div class="exp-card-title">The Dining Room</div>
+        <div class="exp-card-desc">Intimate tables, warm candlelight, and the quiet hum of conversation</div>
+      </div>
+    </div>
+    <div class="exp-card">
+      <div class="exp-card-bg" style="background-image:url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80')"></div>
+      <div class="exp-card-overlay"></div>
+      <div class="exp-card-content">
+        <div class="exp-card-num">02</div>
+        <div class="exp-card-title">The Open Kitchen</div>
+        <div class="exp-card-desc">Watch Chef Sofia at work — the heart of everything we do</div>
+      </div>
+    </div>
+    <div class="exp-card">
+      <div class="exp-card-bg" style="background-image:url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=800&q=80')"></div>
+      <div class="exp-card-overlay"></div>
+      <div class="exp-card-content">
+        <div class="exp-card-num">03</div>
+        <div class="exp-card-title">The Wine Cellar</div>
+        <div class="exp-card-desc">Over 400 labels — Italian classics and rare discoveries, guided by our sommelier</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<section id="testimonials">
+  <div class="section-tag">What Guests Say</div>
+  <h2>Memorable <em style="color:var(--gold-lt)">Evenings</em></h2>
+  <div class="testimonials-track">
+    <div class="tcard">
+      <div class="tcard-stars">★★★★★</div>
+      <div class="tcard-quote">"The tagliatelle al ragù alone is worth the trip. I've dined across Italy and this rivals anything I've had in Bologna. La Stella is a treasure."</div>
+      <div class="tcard-author">
+        <div class="tcard-avatar">GR</div>
+        <div>
+          <div class="tcard-name">Giovanni R.</div>
+          <div class="tcard-detail">New York Times food critic</div>
+        </div>
+      </div>
+    </div>
+    <div class="tcard">
+      <div class="tcard-stars">★★★★★</div>
+      <div class="tcard-quote">"We celebrated our anniversary here. The team arranged a private corner, champagne was waiting, and the tasting menu was flawless from first course to last."</div>
+      <div class="tcard-author">
+        <div class="tcard-avatar">EL</div>
+        <div>
+          <div class="tcard-name">Emily L.</div>
+          <div class="tcard-detail">Guest since 2018</div>
+        </div>
+      </div>
+    </div>
+    <div class="tcard">
+      <div class="tcard-stars">★★★★★</div>
+      <div class="tcard-quote">"The wine pairing was exceptional — our sommelier guided us through six courses with extraordinary knowledge and warmth. We'll be back next month."</div>
+      <div class="tcard-author">
+        <div class="tcard-avatar">DM</div>
+        <div>
+          <div class="tcard-name">Daniel M.</div>
+          <div class="tcard-detail">Wine enthusiast</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── RESERVATION ── -->
+<section id="reservation">
+  <div class="res-info">
+    <div class="section-tag">Reservations</div>
+    <h2>Join Us for<br/><em>an Unforgettable</em> Evening</h2>
+    <p>We recommend booking at least a week in advance for weekend dining. Private dining for groups of 8 or more is available — please call us directly.</p>
+    <div class="res-detail">
+      <div class="res-icon">✦</div>
+      <div>
+        <div class="res-label">Address</div>
+        <div class="res-value">47 Via Della Stella, New York, NY 10012</div>
+      </div>
+    </div>
+    <div class="res-detail">
+      <div class="res-icon">✦</div>
+      <div>
+        <div class="res-label">Hours</div>
+        <div class="res-value">Tue – Thu: 5:30pm – 10:30pm<br/>Fri – Sat: 5:00pm – 11:30pm<br/>Sunday: 4:00pm – 9:30pm</div>
+      </div>
+    </div>
+    <div class="res-detail">
+      <div class="res-icon">✦</div>
+      <div>
+        <div class="res-label">Telephone</div>
+        <div class="res-value">(212) 555-0187</div>
+      </div>
+    </div>
+    <div class="res-detail">
+      <div class="res-icon">✦</div>
+      <div>
+        <div class="res-label">Dress Code</div>
+        <div class="res-value">Smart casual — we want you comfortable</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="form-success" id="formSuccess">Your reservation request has been received. We will confirm within 2 hours.</div>
+    <form class="res-form" id="resForm" onsubmit="handleSubmit(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fname">First Name</label>
+          <input type="text" id="fname" placeholder="Sofia" required />
+        </div>
+        <div class="form-group">
+          <label for="lname">Last Name</label>
+          <input type="text" id="lname" placeholder="Ferretti" required />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="phone">Phone</label>
+          <input type="tel" id="phone" placeholder="(212) 555-0000" required />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="sofia@example.com" required />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="date">Date</label>
+          <input type="date" id="date" required />
+        </div>
+        <div class="form-group">
+          <label for="time">Preferred Time</label>
+          <select id="time" required>
+            <option value="">Select time</option>
+            <option>5:00 PM</option>
+            <option>5:30 PM</option>
+            <option>6:00 PM</option>
+            <option>6:30 PM</option>
+            <option>7:00 PM</option>
+            <option>7:30 PM</option>
+            <option>8:00 PM</option>
+            <option>8:30 PM</option>
+            <option>9:00 PM</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="guests">Number of Guests</label>
+          <select id="guests" required>
+            <option value="">Select</option>
+            <option>1 Guest</option>
+            <option>2 Guests</option>
+            <option>3 Guests</option>
+            <option>4 Guests</option>
+            <option>5 Guests</option>
+            <option>6 Guests</option>
+            <option>7 Guests</option>
+            <option>8+ Guests (call us)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="occasion">Occasion (optional)</label>
+          <select id="occasion">
+            <option value="">None</option>
+            <option>Birthday</option>
+            <option>Anniversary</option>
+            <option>Business Dinner</option>
+            <option>Proposal</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="notes">Special Requests</label>
+        <textarea id="notes" placeholder="Allergies, dietary requirements, seating preferences…"></textarea>
+      </div>
+      <button type="submit" class="form-submit">Request Reservation</button>
+    </form>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <span class="footer-logo">La Stella</span>
+      <span class="footer-tagline">Ristorante Italiano · Est. 1987</span>
+      <p>Fine Italian dining in the heart of New York. Where every meal is a memory in the making.</p>
+    </div>
+    <div>
+      <h4>Navigate</h4>
+      <ul class="footer-links">
+        <li><a href="#story">Our Story</a></li>
+        <li><a href="#menu">The Menu</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#testimonials">Guest Reviews</a></li>
+        <li><a href="#reservation">Reservations</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Dining</h4>
+      <ul class="footer-links">
+        <li><a href="#">Private Dining</a></li>
+        <li><a href="#">Wine Programme</a></li>
+        <li><a href="#">Tasting Menus</a></li>
+        <li><a href="#">Gift Cards</a></li>
+        <li><a href="#">Events &amp; Catering</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul class="footer-links">
+        <li><a href="tel:+12125550187">(212) 555-0187</a></li>
+        <li><a href="mailto:hello@lastella.com">hello@lastella.com</a></li>
+        <li><a href="#">47 Via Della Stella, NY</a></li>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">Facebook</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2024 La Stella Ristorante. All rights reserved.</span>
+    <span>
+      <a href="#" style="color:rgba(255,255,255,.35);text-decoration:none;margin-right:1.2rem;">Privacy Policy</a>
+      <a href="#" style="color:rgba(255,255,255,.35);text-decoration:none;">Accessibility</a>
+    </span>
+  </div>
+</footer>
+
+<script>
+  // Nav scroll effect
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Menu tabs
+  function switchTab(btn, panelId) {
+    document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.menu-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(panelId).classList.add('active');
+  }
+
+  // Reservation form
+  function handleSubmit(e) {
+    e.preventDefault();
+    const form = document.getElementById('resForm');
+    const success = document.getElementById('formSuccess');
+    form.style.opacity = '0.4';
+    form.style.pointerEvents = 'none';
+    setTimeout(() => {
+      success.style.display = 'block';
+      form.reset();
+      form.style.opacity = '1';
+      form.style.pointerEvents = '';
+      success.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 700);
+  }
+
+  // Subtle entrance animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.service-card, .tcard, .exp-card, .why-feature, .menu-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity .6s ease, transform .6s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
