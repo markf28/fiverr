@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FitForge – Your Simple Weight Loss & Fitness Planner</title>
+<meta name="description" content="Calculate your calorie deficit, build a workout split, generate a weekly meal plan, and export it all as a PDF — free and easy." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+  :root{
+    --teal:#0f8b76;
+    --teal-dark:#0b6b5b;
+    --teal-light:#14c9a5;
+    --teal-50:#eafaf6;
+    --coral:#ff7a45;
+    --coral-dark:#e85f2a;
+    --bg:#f5faf8;
+    --card:#ffffff;
+    --ink:#0f2a24;
+    --ink-soft:#4f6a63;
+    --ink-faint:#7c948d;
+    --border:#dbe8e4;
+    --danger:#c0392b;
+    --danger-bg:#fdecea;
+    --radius:16px;
+    --radius-sm:10px;
+    --shadow:0 4px 20px rgba(15,53,45,.08);
+    --shadow-lg:0 16px 44px rgba(15,53,45,.18);
+  }
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.55;
+  }
+
+  h1,h2,h3,h4,.brand{font-family:'Poppins',system-ui,sans-serif;}
+
+  img,svg{display:block;}
+
+  button{font-family:inherit;cursor:pointer;}
+
+  .container{max-width:1080px;margin:0 auto;padding:0 5%;}
+
+  /* ───── App bar ───── */
+  .appbar{
+    position:sticky;top:0;z-index:200;
+    background:rgba(245,250,248,.92);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .appbar-inner{
+    max-width:1080px;margin:0 auto;padding:.85rem 5%;
+    display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  }
+  .brand{display:flex;align-items:center;gap:.55rem;font-weight:800;font-size:1.3rem;color:var(--teal-dark);text-decoration:none;}
+  .brand-badge{
+    width:36px;height:36px;border-radius:10px;
+    background:linear-gradient(135deg,var(--teal),var(--teal-light));
+    display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;
+  }
+  .appbar-actions{display:flex;align-items:center;gap:.75rem;}
+  .link-btn{
+    background:none;border:none;color:var(--ink-soft);font-size:.85rem;font-weight:600;
+    text-decoration:underline;text-underline-offset:3px;
+  }
+  .link-btn:hover{color:var(--danger);}
+
+  /* ───── Hero strip ───── */
+  .hero-strip{padding:2.2rem 0 1.4rem;text-align:center;}
+  .hero-strip h1{font-size:clamp(1.6rem,3.4vw,2.3rem);font-weight:800;color:var(--ink);margin-bottom:.5rem;}
+  .hero-strip p{color:var(--ink-soft);max-width:620px;margin:0 auto;font-size:1rem;}
+  .hero-strip .tagline{color:var(--teal-dark);font-weight:700;display:block;margin-bottom:.3rem;letter-spacing:.02em;text-transform:uppercase;font-size:.75rem;}
+
+  /* ───── Stepper ───── */
+  .stepper{
+    display:flex;align-items:center;justify-content:center;gap:0;
+    max-width:760px;margin:0 auto 2rem;padding:0 5%;flex-wrap:wrap;
+  }
+  .step-btn{
+    display:flex;align-items:center;gap:.55rem;
+    background:none;border:none;padding:.6rem .9rem;border-radius:999px;
+    color:var(--ink-faint);font-weight:600;font-size:.85rem;white-space:nowrap;
+    transition:background .15s,color .15s;
+  }
+  .step-btn .num{
+    width:26px;height:26px;border-radius:50%;background:var(--border);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;
+    flex-shrink:0;transition:background .15s;
+  }
+  .step-btn.active{color:var(--teal-dark);background:var(--teal-50);}
+  .step-btn.active .num{background:var(--teal);}
+  .step-btn.done .num{background:var(--teal-light);}
+  .step-btn.done{color:var(--ink);}
+  .step-sep{width:26px;height:2px;background:var(--border);flex-shrink:0;}
+
+  main{min-height:60vh;padding-bottom:4rem;}
+  .step-section{display:none;}
+  .step-section.active{display:block;animation:fadeIn .25s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ───── Cards ───── */
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:1.75rem;box-shadow:var(--shadow);margin-bottom:1.5rem;
+  }
+  .card h2{font-size:1.35rem;font-weight:700;margin-bottom:.3rem;color:var(--ink);}
+  .card .sub{color:var(--ink-soft);font-size:.92rem;margin-bottom:1.4rem;}
+
+  /* ───── Forms ───── */
+  .field{margin-bottom:1.15rem;}
+  .field label{display:block;font-weight:600;font-size:.85rem;color:var(--ink);margin-bottom:.4rem;}
+  .field .hint{font-size:.78rem;color:var(--ink-faint);margin-top:.3rem;}
+  input[type="number"],input[type="text"],select{
+    width:100%;padding:.65rem .8rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+    font-size:.95rem;background:#fff;color:var(--ink);font-family:inherit;
+  }
+  input:focus,select:focus{outline:none;border-color:var(--teal);}
+  .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;}
+  .row-tight{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.7rem;}
+
+  .unit-toggle{display:inline-flex;background:var(--teal-50);border-radius:999px;padding:.25rem;margin-bottom:1.3rem;}
+  .unit-toggle button{
+    border:none;background:none;padding:.5rem 1.1rem;border-radius:999px;font-weight:600;font-size:.85rem;
+    color:var(--teal-dark);
+  }
+  .unit-toggle button.active{background:var(--teal);color:#fff;}
+
+  .seg{display:flex;flex-wrap:wrap;gap:.5rem;}
+  .seg button{
+    padding:.55rem 1rem;border-radius:999px;border:1.5px solid var(--border);background:#fff;
+    font-weight:600;font-size:.85rem;color:var(--ink-soft);transition:.15s;
+  }
+  .seg button.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .seg button:hover:not(.active){border-color:var(--teal-light);}
+
+  .radio-row{display:flex;gap:1.4rem;flex-wrap:wrap;}
+  .radio-opt{display:flex;align-items:center;gap:.4rem;font-size:.9rem;font-weight:500;}
+  .radio-opt input{width:auto;}
+
+  .checkbox-line{display:flex;align-items:flex-start;gap:.55rem;font-size:.9rem;padding:.6rem 0;}
+  .checkbox-line input{width:auto;margin-top:.2rem;}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+    padding:.85rem 1.7rem;border-radius:999px;font-weight:700;font-size:.95rem;
+    border:none;transition:transform .15s,background .15s;
+  }
+  .btn-primary{background:var(--teal);color:#fff;}
+  .btn-primary:hover{background:var(--teal-dark);transform:translateY(-1px);}
+  .btn-coral{background:var(--coral);color:#fff;}
+  .btn-coral:hover{background:var(--coral-dark);transform:translateY(-1px);}
+  .btn-ghost{background:none;border:1.5px solid var(--border);color:var(--ink-soft);}
+  .btn-ghost:hover{border-color:var(--teal);color:var(--teal-dark);}
+  .btn-sm{padding:.5rem 1rem;font-size:.82rem;}
+  .btn-row{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1.4rem;}
+
+  .error-banner{
+    background:var(--danger-bg);color:var(--danger);border:1.5px solid #f3c8c4;border-radius:var(--radius-sm);
+    padding:.8rem 1rem;font-size:.88rem;font-weight:600;margin-bottom:1.2rem;display:none;
+  }
+  .error-banner.show{display:block;}
+
+  /* ───── Results ───── */
+  .results{display:none;}
+  .results.show{display:block;}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.9rem;margin-bottom:1.3rem;}
+  .stat{
+    background:var(--teal-50);border-radius:var(--radius-sm);padding:1rem 1.1rem;text-align:left;
+  }
+  .stat .label{font-size:.75rem;color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+  .stat .value{font-size:1.5rem;font-weight:800;color:var(--teal-dark);margin-top:.2rem;}
+  .stat .unit{font-size:.85rem;font-weight:600;color:var(--ink-faint);}
+  .stat.highlight{background:linear-gradient(135deg,var(--teal),var(--teal-light));}
+  .stat.highlight .label,.stat.highlight .unit{color:rgba(255,255,255,.85);}
+  .stat.highlight .value{color:#fff;}
+
+  .macro-bars{margin:1rem 0;}
+  .macro-row{display:flex;align-items:center;gap:.8rem;margin-bottom:.6rem;font-size:.85rem;}
+  .macro-row .mlabel{width:70px;font-weight:700;flex-shrink:0;}
+  .macro-row .mbar-track{flex:1;height:10px;background:var(--border);border-radius:99px;overflow:hidden;}
+  .macro-row .mbar-fill{height:100%;border-radius:99px;}
+  .macro-row .mval{width:110px;text-align:right;color:var(--ink-soft);flex-shrink:0;}
+
+  .note{
+    font-size:.85rem;padding:.8rem 1rem;border-radius:var(--radius-sm);margin-top:.9rem;
+    background:#fff7e8;border:1.5px solid #f3dfae;color:#8a6716;
+  }
+  .note.info{background:var(--teal-50);border-color:#bfe6da;color:var(--teal-dark);}
+
+  /* ───── Chips (workout days / muscles) ───── */
+  .chip{
+    padding:.55rem 1rem;border-radius:999px;border:1.5px solid var(--border);background:#fff;
+    font-weight:600;font-size:.85rem;color:var(--ink-soft);
+  }
+  .chip.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .chip.rest-active{background:var(--ink-faint);border-color:var(--ink-faint);color:#fff;}
+  .chip-group{display:flex;flex-wrap:wrap;gap:.5rem;}
+
+  .mode-toggle{display:flex;gap:.8rem;margin:1.2rem 0;flex-wrap:wrap;}
+  .mode-card{
+    flex:1;min-width:220px;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:.9rem 1rem;
+    cursor:pointer;
+  }
+  .mode-card.active{border-color:var(--teal);background:var(--teal-50);}
+  .mode-card strong{display:block;font-size:.9rem;}
+  .mode-card span{font-size:.8rem;color:var(--ink-soft);}
+
+  .day-editor{border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:1rem;margin-bottom:.8rem;}
+  .day-editor .dtitle{font-weight:700;margin-bottom:.6rem;font-size:.9rem;}
+
+  .schedule-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:1.3rem;}
+  .day-card{border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:1.1rem;background:#fff;break-inside:avoid;}
+  .day-card.rest{background:#fafcfb;}
+  .day-card h4{font-size:.95rem;font-weight:800;margin-bottom:.2rem;}
+  .day-card .focus{font-size:.8rem;font-weight:700;color:var(--teal-dark);margin-bottom:.6rem;}
+  .day-card .rest-tag{font-size:.8rem;color:var(--ink-faint);font-style:italic;}
+  .day-card ul{padding-left:1.1rem;font-size:.82rem;color:var(--ink-soft);margin-bottom:.4rem;}
+  .day-card ul li{margin-bottom:.15rem;}
+  .day-card .muscle-tag{
+    display:inline-block;background:var(--teal-50);color:var(--teal-dark);font-size:.7rem;font-weight:700;
+    padding:.15rem .5rem;border-radius:6px;margin:0 .25rem .35rem 0;
+  }
+
+  /* ───── Meal cards ───── */
+  .meal-prefs .row{margin-bottom:.4rem;}
+  .day-block{margin-bottom:1.6rem;}
+  .day-block-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:.7rem;flex-wrap:wrap;gap:.4rem;}
+  .day-block-head h4{font-size:1.05rem;font-weight:800;}
+  .day-block-head .totals{font-size:.82rem;color:var(--ink-soft);font-weight:600;}
+  .meal-row{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;
+    border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:.85rem 1rem;margin-bottom:.6rem;
+    break-inside:avoid;
+  }
+  .meal-row .mslot{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--coral-dark);margin-bottom:.15rem;}
+  .meal-row .mname{font-weight:700;font-size:.94rem;}
+  .meal-row .mingr{font-size:.78rem;color:var(--ink-faint);margin-top:.25rem;}
+  .meal-row .mnums{text-align:right;font-size:.82rem;color:var(--ink-soft);white-space:nowrap;flex-shrink:0;}
+  .meal-row .mnums strong{display:block;color:var(--ink);font-size:.95rem;}
+  .swap-btn{
+    background:var(--teal-50);border:none;border-radius:999px;width:30px;height:30px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;color:var(--teal-dark);margin-left:.5rem;
+  }
+  .swap-btn:hover{background:var(--teal-light);color:#fff;}
+  .meal-left{display:flex;align-items:flex-start;flex:1;}
+
+  .grocery-list{columns:2;column-gap:2rem;}
+  @media (max-width:600px){.grocery-list{columns:1;}}
+  .grocery-item{display:flex;align-items:center;gap:.5rem;font-size:.88rem;padding:.3rem 0;break-inside:avoid;}
+  .grocery-item input{width:auto;}
+
+  /* ───── Summary ───── */
+  .summary-block{margin-bottom:2rem;}
+  .summary-block h3{font-size:1.1rem;font-weight:800;color:var(--teal-dark);margin-bottom:.8rem;border-bottom:2px solid var(--teal-50);padding-bottom:.4rem;}
+  table.summary-table{width:100%;border-collapse:collapse;font-size:.85rem;}
+  table.summary-table th,table.summary-table td{text-align:left;padding:.55rem .6rem;border-bottom:1px solid var(--border);}
+  table.summary-table th{color:var(--ink-soft);font-size:.75rem;text-transform:uppercase;letter-spacing:.03em;}
+  .tips-list{list-style:none;}
+  .tips-list li{padding:.5rem 0 .5rem 1.6rem;position:relative;font-size:.9rem;color:var(--ink-soft);}
+  .tips-list li::before{content:"✓";position:absolute;left:0;color:var(--teal);font-weight:800;}
+
+  .empty-hint{
+    text-align:center;padding:2rem 1rem;color:var(--ink-faint);font-size:.9rem;border:2px dashed var(--border);border-radius:var(--radius-sm);
+  }
+
+  footer{padding:2rem 5% 3rem;text-align:center;color:var(--ink-faint);font-size:.78rem;}
+  footer p{max-width:640px;margin:.3rem auto 0;}
+
+  @media (max-width:640px){
+    .card{padding:1.2rem;}
+    .step-btn span.label{display:none;}
+    .step-btn{padding:.6rem;}
+  }
+
+  /* ───── Print ───── */
+  @media print{
+    .no-print{display:none!important;}
+    body{background:#fff;}
+    .step-section{display:none!important;}
+    .step-section#step-4{display:block!important;}
+    .card{box-shadow:none;border:1px solid #ccc;}
+    main{padding-bottom:0;}
+    .swap-btn{display:none!important;}
+    a[href]::after{content:"";}
+  }
+</style>
+</head>
+<body>
+
+<header class="appbar no-print">
+  <div class="appbar-inner">
+    <a href="#" class="brand">
+      <span class="brand-badge">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6.5 6.5 3 10l4 4M17.5 6.5 21 10l-4 4M8 12h8M6.5 6.5l3-3M17.5 6.5l-3-3M8.5 17.5l-3 3M15.5 17.5l3 3"/></svg>
+      </span>
+      FitForge
+    </a>
+    <div class="appbar-actions">
+      <button class="link-btn" onclick="resetAll()">Start Over</button>
+    </div>
+  </div>
+</header>
+
+<div class="hero-strip container no-print">
+  <span class="tagline">Free weight-loss planner</span>
+  <h1>Forge a plan you'll actually stick to</h1>
+  <p>Answer a few quick questions and get your daily calorie target, a weekly workout split, and a full meal plan with a grocery list — then export it as a PDF.</p>
+</div>
+
+<nav class="stepper no-print" id="stepper">
+  <button class="step-btn" data-step="1" onclick="showStep(1)"><span class="num">1</span><span class="label">Your Info</span></button>
+  <div class="step-sep"></div>
+  <button class="step-btn" data-step="2" onclick="showStep(2)"><span class="num">2</span><span class="label">Workout</span></button>
+  <div class="step-sep"></div>
+  <button class="step-btn" data-step="3" onclick="showStep(3)"><span class="num">3</span><span class="label">Meals</span></button>
+  <div class="step-sep"></div>
+  <button class="step-btn" data-step="4" onclick="showStep(4)"><span class="num">4</span><span class="label">Your Plan</span></button>
+</nav>
+
+<main class="container">
+
+  <!-- ============ STEP 1: PROFILE & CALORIE CALCULATOR ============ -->
+  <section class="step-section" id="step-1">
+    <div class="card">
+      <h2>Tell us about you</h2>
+      <p class="sub">We'll use this to calculate your calorie needs and a safe, sustainable deficit.</p>
+
+      <div class="error-banner" id="p1-error"></div>
+
+      <div class="unit-toggle" id="unit-toggle">
+        <button type="button" class="active" data-unit="imperial" onclick="setUnits('imperial')">Imperial (lb / ft-in)</button>
+        <button type="button" data-unit="metric" onclick="setUnits('metric')">Metric (kg / cm)</button>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Sex</label>
+          <div class="radio-row">
+            <label class="radio-opt"><input type="radio" name="sex" value="male" checked> Male</label>
+            <label class="radio-opt"><input type="radio" name="sex" value="female"> Female</label>
+          </div>
+          <p class="hint">Used only to calculate your calorie needs accurately.</p>
+        </div>
+        <div class="field">
+          <label for="age">Age</label>
+          <input type="number" id="age" min="14" max="90" placeholder="e.g. 30">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field" id="height-imperial">
+          <label>Height</label>
+          <div class="row-tight">
+            <input type="number" id="height-ft" min="3" max="8" placeholder="Feet">
+            <input type="number" id="height-in" min="0" max="11" placeholder="Inches">
+          </div>
+        </div>
+        <div class="field" id="height-metric" style="display:none;">
+          <label for="height-cm">Height (cm)</label>
+          <input type="number" id="height-cm" min="90" max="250" placeholder="e.g. 175">
+        </div>
+        <div class="field" id="weight-imperial">
+          <label for="weight-lb">Current weight (lb)</label>
+          <input type="number" id="weight-lb" min="60" max="700" placeholder="e.g. 180">
+        </div>
+        <div class="field" id="weight-metric" style="display:none;">
+          <label for="weight-kg">Current weight (kg)</label>
+          <input type="number" id="weight-kg" min="30" max="300" placeholder="e.g. 82">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="activity">Activity level</label>
+        <select id="activity">
+          <option value="1.2">Sedentary — little or no exercise</option>
+          <option value="1.375">Lightly active — light exercise 1-3 days/week</option>
+          <option value="1.55" selected>Moderately active — moderate exercise 3-5 days/week</option>
+          <option value="1.725">Very active — hard exercise 6-7 days/week</option>
+          <option value="1.9">Extremely active — physical job or 2x/day training</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="goal">Goal</label>
+        <select id="goal" onchange="onGoalChange()">
+          <option value="lose" selected>Lose weight</option>
+          <option value="maintain">Maintain weight</option>
+          <option value="gain">Gain muscle (slight surplus)</option>
+        </select>
+      </div>
+
+      <div class="row" id="rate-row">
+        <div class="field">
+          <label for="rate">Rate of weight loss</label>
+          <select id="rate"></select>
+          <p class="hint">1-2 lb (0.5-1 kg) per week is considered safe and sustainable for most people.</p>
+        </div>
+        <div class="field" id="goal-weight-imperial">
+          <label for="goal-weight-lb">Goal weight (lb) — optional</label>
+          <input type="number" id="goal-weight-lb" min="60" max="700" placeholder="e.g. 160">
+        </div>
+        <div class="field" id="goal-weight-metric" style="display:none;">
+          <label for="goal-weight-kg">Goal weight (kg) — optional</label>
+          <input type="number" id="goal-weight-kg" min="30" max="300" placeholder="e.g. 73">
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="calculatePlan()">Calculate My Plan</button>
+      </div>
+    </div>
+
+    <div class="card results" id="results-card">
+      <h2>Your Numbers</h2>
+      <p class="sub">Based on the Mifflin-St Jeor formula — the standard used by dietitians.</p>
+
+      <div class="stat-grid">
+        <div class="stat"><div class="label">BMR</div><div class="value" id="r-bmr">–</div><div class="unit">kcal/day at rest</div></div>
+        <div class="stat"><div class="label">Maintenance (TDEE)</div><div class="value" id="r-tdee">–</div><div class="unit">kcal/day</div></div>
+        <div class="stat highlight"><div class="label">Your Daily Target</div><div class="value" id="r-target">–</div><div class="unit">kcal/day</div></div>
+        <div class="stat"><div class="label" id="r-delta-label">Daily deficit</div><div class="value" id="r-delta">–</div><div class="unit">kcal/day</div></div>
+      </div>
+
+      <div id="r-capped-note" class="note" style="display:none;"></div>
+      <div id="r-timeline-note" class="note info" style="display:none;"></div>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:1.3rem 0 .3rem;">Suggested Macros</h3>
+      <div class="macro-bars" id="macro-bars"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="showStep(2)">Next: Build Your Workout →</button>
+    </div>
+  </section>
+
+  <!-- ============ STEP 2: WORKOUT PLAN ============ -->
+  <section class="step-section" id="step-2">
+    <div class="card">
+      <h2>Build Your Workout Split</h2>
+      <p class="sub">Pick the days you'll train. We'll tell you exactly which muscles to hit each day.</p>
+
+      <div class="field">
+        <label>Which days can you work out?</label>
+        <div class="chip-group" id="day-picker"></div>
+      </div>
+
+      <div class="mode-toggle">
+        <div class="mode-card active" id="mode-auto" onclick="setWorkoutMode('auto')">
+          <strong>Auto-recommend my split</strong>
+          <span>We'll assign the best muscle groups per day based on how many days you picked.</span>
+        </div>
+        <div class="mode-card" id="mode-custom" onclick="setWorkoutMode('custom')">
+          <strong>Let me customize each day</strong>
+          <span>You choose exactly which muscle groups to train on each selected day.</span>
+        </div>
+      </div>
+
+      <div id="custom-editor"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="buildSchedule()">Build My Schedule</button>
+      </div>
+    </div>
+
+    <div class="card" id="schedule-card" style="display:none;">
+      <h2>Your Weekly Schedule</h2>
+      <p class="sub" id="schedule-tip"></p>
+      <div class="schedule-grid" id="schedule-grid"></div>
+      <div class="note info">Aim for 150+ minutes of moderate cardio a week on top of this (walking counts!) to speed up fat loss and support heart health.</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="showStep(1)">← Back</button>
+      <button class="btn btn-ghost" onclick="showStep(3)">Next: Plan Your Meals →</button>
+    </div>
+  </section>
+
+  <!-- ============ STEP 3: MEAL PLAN ============ -->
+  <section class="step-section" id="step-3">
+    <div class="card meal-prefs">
+      <h2>Your Meal Preferences</h2>
+      <p class="sub">We'll build a full week of meals that fits your calorie target and your taste.</p>
+
+      <div class="row">
+        <div class="field">
+          <label for="diet-type">Diet type</label>
+          <select id="diet-type">
+            <option value="none" selected>No restrictions</option>
+            <option value="vegetarian">Vegetarian</option>
+            <option value="vegan">Vegan</option>
+            <option value="pescatarian">Pescatarian (fish OK)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="meals-per-day">Meal structure</label>
+          <select id="meals-per-day">
+            <option value="3">3 meals a day</option>
+            <option value="5" selected>3 meals + 2 snacks</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="calorie-override">Daily calorie target</label>
+        <input type="number" id="calorie-override" placeholder="Auto-filled from Step 1">
+        <p class="hint" id="calorie-source-hint">Complete Step 1 to auto-fill this, or set your own number.</p>
+      </div>
+
+      <div class="field">
+        <label for="dislikes">Allergies or foods you dislike (comma separated)</label>
+        <input type="text" id="dislikes" placeholder="e.g. shellfish, mushrooms, cilantro">
+      </div>
+
+      <label class="checkbox-line"><input type="checkbox" id="picky-eater"> I'm a picky eater — stick to simple, familiar meals</label>
+      <label class="checkbox-line"><input type="checkbox" id="quick-only"> Only show meals that take 15 minutes or less to prep</label>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="generateWeekPlan()">Generate My Weekly Meal Plan</button>
+      </div>
+    </div>
+
+    <div class="card" id="mealplan-card" style="display:none;">
+      <h2>Your Weekly Meal Plan</h2>
+      <p class="sub" id="mealplan-sub"></p>
+      <div id="mealplan-days"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="generateWeekPlan()">🔀 Regenerate Whole Week</button>
+      </div>
+    </div>
+
+    <div class="card" id="grocery-card" style="display:none;">
+      <h2>Grocery List</h2>
+      <p class="sub">Everything you need for the week, auto-collected from your meal plan.</p>
+      <div class="grocery-list" id="grocery-list"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="showStep(2)">← Back</button>
+      <button class="btn btn-ghost" onclick="showStep(4)">Next: See Your Full Plan →</button>
+    </div>
+  </section>
+
+  <!-- ============ STEP 4: SUMMARY & EXPORT ============ -->
+  <section class="step-section" id="step-4">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;" class="no-print">
+        <div>
+          <h2>Your Complete Plan</h2>
+          <p class="sub" style="margin-bottom:0;">Everything in one place — save it as a PDF to keep on your phone or print it out.</p>
+        </div>
+        <button class="btn btn-coral" onclick="exportPDF()">⬇ Export as PDF</button>
+      </div>
+
+      <div id="summary-content">
+        <div class="empty-hint" id="summary-empty">Complete steps 1-3 to see your full plan here.</div>
+      </div>
+    </div>
+
+    <div class="btn-row no-print">
+      <button class="btn btn-ghost" onclick="showStep(3)">← Back to Meals</button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="no-print">
+  <p><strong>FitForge</strong> is a free planning tool for general wellness purposes only and does not provide medical advice.</p>
+  <p>Always consult a doctor or registered dietitian before starting a new diet or exercise program, especially if you have a medical condition.</p>
+</footer>
+
+<script>
+/* ============================= DATA ============================= */
+
+const MUSCLES = {
+  chest:     { name:'Chest',     exercises:['Push-ups / Incline Push-ups','Dumbbell or Barbell Bench Press','Chest Dips','Cable or Band Chest Flyes'] },
+  back:      { name:'Back',      exercises:['Bent-over Dumbbell Rows','Pull-ups or Lat Pulldown','Seated Cable / Band Rows','Superman Holds'] },
+  legs:      { name:'Legs',      exercises:['Bodyweight or Barbell Squats','Walking Lunges','Romanian Deadlifts','Standing Calf Raises'] },
+  shoulders: { name:'Shoulders', exercises:['Overhead Press','Lateral Raises','Front Raises','Face Pulls'] },
+  arms:      { name:'Arms',      exercises:['Bicep Curls','Hammer Curls','Tricep Dips','Overhead Tricep Extension'] },
+  core:      { name:'Core',      exercises:['Plank (hold 30-60s)','Bicycle Crunches','Russian Twists','Hanging or Lying Leg Raises'] },
+  cardio:    { name:'Cardio',    exercises:['Brisk Walk or Jog (20-30 min)','Cycling (20-30 min)','Jump Rope Intervals','Rowing Machine'] }
+};
+
+const SPLIT_MUSCLES = {
+  'Full Body':   ['chest','back','legs','core'],
+  'Full Body A': ['chest','legs','core'],
+  'Full Body B': ['back','legs','shoulders'],
+  'Full Body C': ['chest','back','arms'],
+  'Upper Body':  ['chest','back','shoulders','arms'],
+  'Lower Body':  ['legs','core'],
+  'Push':        ['chest','shoulders','arms'],
+  'Pull':        ['back','arms'],
+  'Legs':        ['legs','core'],
+  'Active Recovery': ['cardio']
+};
+
+const DAY_COUNT_TEMPLATES = {
+  1: ['Full Body'],
+  2: ['Upper Body','Lower Body'],
+  3: ['Full Body A','Full Body B','Full Body C'],
+  4: ['Upper Body','Lower Body','Upper Body','Lower Body'],
+  5: ['Push','Pull','Legs','Upper Body','Lower Body'],
+  6: ['Push','Pull','Legs','Push','Pull','Legs'],
+  7: ['Push','Pull','Legs','Push','Pull','Legs','Active Recovery']
+};
+
+const DAYS = [
+  {key:'mon',label:'Monday'},{key:'tue',label:'Tuesday'},{key:'wed',label:'Wednesday'},
+  {key:'thu',label:'Thursday'},{key:'fri',label:'Friday'},{key:'sat',label:'Saturday'},{key:'sun',label:'Sunday'}
+];
+
+const BREAKFASTS = [
+  {name:'Greek Yogurt with Berries & Granola', cal:350, protein:25, tags:['vegetarian'], picky:true, quick:true, ingredients:['Greek yogurt','Mixed berries','Granola','Honey']},
+  {name:'Veggie Egg Scramble with Whole Wheat Toast', cal:380, protein:24, tags:['vegetarian'], picky:false, quick:true, ingredients:['Eggs','Spinach','Bell pepper','Onion','Whole wheat bread']},
+  {name:'Oatmeal with Peanut Butter & Banana', cal:420, protein:16, tags:['vegetarian','vegan'], picky:true, quick:true, ingredients:['Rolled oats','Peanut butter','Banana','Almond milk']},
+  {name:'Banana Spinach Protein Smoothie', cal:350, protein:30, tags:['vegetarian','vegan'], picky:false, quick:true, ingredients:['Protein powder','Banana','Spinach','Almond milk','Ice']},
+  {name:'Turkey Bacon & Egg White Muffins', cal:320, protein:28, tags:[], picky:false, quick:false, ingredients:['Egg whites','Turkey bacon','Bell pepper','Onion']},
+  {name:'Avocado Toast with Fried Egg', cal:400, protein:18, tags:['vegetarian'], picky:false, quick:true, ingredients:['Whole grain bread','Avocado','Egg','Chili flakes']},
+  {name:'Cottage Cheese with Pineapple', cal:280, protein:24, tags:['vegetarian'], picky:true, quick:true, ingredients:['Cottage cheese','Pineapple chunks']},
+  {name:'Breakfast Burrito (Egg, Black Bean & Salsa)', cal:450, protein:26, tags:['vegetarian'], picky:false, quick:true, ingredients:['Tortilla','Eggs','Black beans','Salsa','Cheese']},
+  {name:'Overnight Chia Pudding', cal:320, protein:12, tags:['vegetarian','vegan'], picky:true, quick:true, ingredients:['Chia seeds','Almond milk','Honey','Berries']},
+  {name:'Whole Grain Cereal with Milk & Banana', cal:300, protein:12, tags:['vegetarian'], picky:true, quick:true, ingredients:['Whole grain cereal','Milk','Banana']},
+  {name:'Bagel with Cream Cheese & Smoked Salmon', cal:430, protein:22, tags:['pescatarian'], picky:false, quick:true, ingredients:['Bagel','Cream cheese','Smoked salmon','Red onion']},
+  {name:'Protein Pancakes', cal:380, protein:28, tags:['vegetarian'], picky:true, quick:false, ingredients:['Protein powder','Eggs','Banana','Oats']},
+  {name:'Breakfast Quesadilla (Egg & Cheese)', cal:400, protein:22, tags:['vegetarian'], picky:true, quick:true, ingredients:['Tortilla','Eggs','Cheese','Salsa']},
+  {name:'Steel-Cut Oats with Almonds & Cinnamon', cal:360, protein:12, tags:['vegetarian','vegan'], picky:false, quick:false, ingredients:['Steel-cut oats','Almonds','Cinnamon','Maple syrup']},
+  {name:'Egg & Veggie Muffin Cups with Fruit', cal:340, protein:22, tags:['vegetarian'], picky:false, quick:false, ingredients:['Eggs','Mixed vegetables','Cheese','Mixed fruit']},
+  {name:'PB&J Protein Toast', cal:380, protein:20, tags:['vegetarian'], picky:true, quick:true, ingredients:['Whole grain bread','Peanut butter','Strawberry jam']}
+];
+
+const LUNCHES = [
+  {name:'Grilled Chicken Salad with Vinaigrette', cal:450, protein:40, tags:[], picky:false, quick:true, ingredients:['Chicken breast','Mixed greens','Cherry tomatoes','Cucumber','Vinaigrette']},
+  {name:'Turkey & Avocado Wrap', cal:480, protein:30, tags:[], picky:true, quick:true, ingredients:['Tortilla','Turkey breast','Avocado','Lettuce']},
+  {name:'Chickpea & Quinoa Buddha Bowl', cal:500, protein:20, tags:['vegetarian','vegan'], picky:false, quick:false, ingredients:['Quinoa','Chickpeas','Roasted vegetables','Tahini']},
+  {name:'Tuna Salad on Whole Grain Bread', cal:420, protein:32, tags:['pescatarian'], picky:true, quick:true, ingredients:['Canned tuna','Greek yogurt','Whole grain bread','Celery']},
+  {name:'Beef & Broccoli Stir-Fry with Rice', cal:550, protein:35, tags:[], picky:false, quick:false, ingredients:['Lean beef strips','Broccoli','Soy sauce','Rice']},
+  {name:'Grilled Shrimp Tacos', cal:480, protein:30, tags:['pescatarian'], picky:false, quick:true, ingredients:['Shrimp','Corn tortillas','Cabbage slaw','Lime']},
+  {name:'Classic Turkey Club Sandwich', cal:500, protein:28, tags:[], picky:true, quick:true, ingredients:['Turkey breast','Bacon','Lettuce','Tomato','Whole grain bread']},
+  {name:'Black Bean & Sweet Potato Bowl', cal:470, protein:18, tags:['vegetarian','vegan'], picky:false, quick:false, ingredients:['Black beans','Sweet potato','Brown rice','Avocado']},
+  {name:'Chicken Burrito Bowl', cal:550, protein:42, tags:[], picky:true, quick:false, ingredients:['Chicken breast','Brown rice','Black beans','Salsa','Cheese']},
+  {name:'Caprese Sandwich with Side Salad', cal:460, protein:18, tags:['vegetarian'], picky:false, quick:true, ingredients:['Mozzarella','Tomato','Basil','Ciabatta bread']},
+  {name:'Lentil Soup with Side Bread', cal:420, protein:22, tags:['vegetarian','vegan'], picky:false, quick:false, ingredients:['Lentils','Carrots','Celery','Onion','Whole grain bread']},
+  {name:'Grilled Chicken Pesto Pasta', cal:560, protein:38, tags:[], picky:true, quick:false, ingredients:['Chicken breast','Whole wheat pasta','Pesto','Cherry tomatoes']},
+  {name:'Egg Salad Lettuce Wraps', cal:400, protein:24, tags:['vegetarian'], picky:false, quick:true, ingredients:['Hard-boiled eggs','Greek yogurt','Lettuce leaves','Mustard']},
+  {name:'Salmon Rice Bowl with Edamame', cal:520, protein:34, tags:['pescatarian'], picky:false, quick:false, ingredients:['Salmon','Rice','Edamame','Cucumber','Soy sauce']},
+  {name:'Classic Grilled Cheese & Tomato Soup', cal:480, protein:18, tags:['vegetarian'], picky:true, quick:true, ingredients:['Whole grain bread','Cheese','Tomato soup']},
+  {name:'Mediterranean Chicken Wrap', cal:490, protein:33, tags:[], picky:false, quick:true, ingredients:['Chicken','Hummus','Cucumber','Feta','Wrap']}
+];
+
+const DINNERS = [
+  {name:'Baked Salmon with Roasted Vegetables', cal:550, protein:38, tags:['pescatarian'], picky:false, quick:false, ingredients:['Salmon fillet','Broccoli','Carrots','Olive oil']},
+  {name:'Grilled Chicken with Sweet Potato & Green Beans', cal:560, protein:45, tags:[], picky:true, quick:false, ingredients:['Chicken breast','Sweet potato','Green beans']},
+  {name:'Lean Beef Stir-Fry with Brown Rice', cal:600, protein:38, tags:[], picky:false, quick:false, ingredients:['Lean beef','Stir-fry vegetables','Brown rice','Soy sauce']},
+  {name:'Turkey Chili', cal:480, protein:36, tags:[], picky:false, quick:false, ingredients:['Ground turkey','Kidney beans','Tomatoes','Onion','Chili spices']},
+  {name:'Shrimp & Vegetable Stir-Fry', cal:460, protein:32, tags:['pescatarian'], picky:false, quick:true, ingredients:['Shrimp','Bell peppers','Snap peas','Garlic sauce']},
+  {name:'Vegetable & Tofu Stir-Fry with Rice', cal:500, protein:22, tags:['vegetarian','vegan'], picky:false, quick:false, ingredients:['Tofu','Mixed vegetables','Rice','Soy sauce']},
+  {name:'Baked Chicken Parmesan with Side Salad', cal:600, protein:42, tags:[], picky:true, quick:false, ingredients:['Chicken breast','Marinara sauce','Mozzarella','Side salad']},
+  {name:'Spaghetti Squash with Turkey Meat Sauce', cal:480, protein:32, tags:[], picky:false, quick:false, ingredients:['Spaghetti squash','Ground turkey','Marinara sauce']},
+  {name:'Grilled Steak with Roasted Potatoes', cal:650, protein:40, tags:[], picky:true, quick:false, ingredients:['Sirloin steak','Baby potatoes','Asparagus']},
+  {name:'Veggie & Black Bean Burrito Bowl', cal:520, protein:20, tags:['vegetarian','vegan'], picky:false, quick:false, ingredients:['Black beans','Rice','Corn','Salsa','Avocado']},
+  {name:'Baked Cod with Quinoa & Asparagus', cal:480, protein:36, tags:['pescatarian'], picky:false, quick:false, ingredients:['Cod fillet','Quinoa','Asparagus','Lemon']},
+  {name:'Chicken Fajita Bowl', cal:560, protein:40, tags:[], picky:false, quick:false, ingredients:['Chicken breast','Bell peppers','Onion','Rice','Salsa']},
+  {name:'Turkey Meatballs with Zucchini Noodles', cal:500, protein:34, tags:[], picky:false, quick:false, ingredients:['Ground turkey','Zucchini','Marinara sauce','Parmesan']},
+  {name:'Cheese & Veggie Quesadilla', cal:520, protein:22, tags:['vegetarian'], picky:true, quick:true, ingredients:['Tortilla','Cheese','Bell peppers','Onion']},
+  {name:'Grilled Chicken Caesar Salad', cal:480, protein:40, tags:[], picky:true, quick:true, ingredients:['Chicken breast','Romaine lettuce','Parmesan','Caesar dressing']},
+  {name:'Lentil & Vegetable Curry with Rice', cal:540, protein:20, tags:['vegetarian','vegan'], picky:false, quick:false, ingredients:['Lentils','Coconut milk','Curry spices','Rice']}
+];
+
+const SNACKS = [
+  {name:'Apple with Peanut Butter', cal:200, protein:6, tags:['vegetarian','vegan'], picky:true, quick:true, ingredients:['Apple','Peanut butter']},
+  {name:'Protein Shake', cal:150, protein:25, tags:['vegetarian'], picky:false, quick:true, ingredients:['Protein powder','Milk or water']},
+  {name:'Handful of Almonds', cal:170, protein:6, tags:['vegetarian','vegan'], picky:true, quick:true, ingredients:['Almonds']},
+  {name:'Greek Yogurt Cup', cal:130, protein:15, tags:['vegetarian'], picky:true, quick:true, ingredients:['Greek yogurt']},
+  {name:'Baby Carrots with Hummus', cal:150, protein:5, tags:['vegetarian','vegan'], picky:false, quick:true, ingredients:['Carrots','Hummus']},
+  {name:'Rice Cakes with Almond Butter', cal:180, protein:5, tags:['vegetarian','vegan'], picky:true, quick:true, ingredients:['Rice cakes','Almond butter']},
+  {name:'Two Hard-Boiled Eggs', cal:140, protein:12, tags:['vegetarian'], picky:true, quick:true, ingredients:['Eggs']},
+  {name:'String Cheese & Whole Grain Crackers', cal:180, protein:9, tags:['vegetarian'], picky:true, quick:true, ingredients:['String cheese','Whole grain crackers']},
+  {name:'Cottage Cheese with Cucumber', cal:140, protein:18, tags:['vegetarian'], picky:false, quick:true, ingredients:['Cottage cheese','Cucumber']},
+  {name:'Trail Mix (Nuts & Dried Fruit)', cal:200, protein:6, tags:['vegetarian','vegan'], picky:false, quick:true, ingredients:['Mixed nuts','Dried fruit']}
+];
+
+const ADHERENCE_TIPS = [
+  'Prep meals in bulk one or two days a week — it removes the daily "what do I eat" decision.',
+  'Hit your protein target first each day; it keeps you full and protects muscle while in a deficit.',
+  'Weigh yourself 2-3x a week (same time of day) and track the weekly average, not single-day swings.',
+  'Drink a glass of water before meals — it helps with portion control and hunger cues.',
+  'Build in one flexible or "free" meal a week so the plan feels sustainable, not restrictive.',
+  'Aim for 7-9 hours of sleep — poor sleep increases hunger hormones and cravings.',
+  'Progress photos and measurements often show change before the scale does — track both.'
+];
+
+/* ============================= STATE ============================= */
+
+const STORAGE_KEY = 'fitforge_state_v1';
+
+let state = {
+  step: 1,
+  units: 'imperial',
+  results: null,
+  workout: { days: ['mon','wed','fri'], mode: 'auto', assignments: {}, customPicks: {} },
+  weekPlan: null
+};
+
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      state = Object.assign(state, parsed);
+    }
+  }catch(e){}
+}
+
+/* ============================= HELPERS ============================= */
+
+function el(id){ return document.getElementById(id); }
+function fmt(n){ return Math.round(n).toLocaleString('en-US'); }
+function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }
+
+/* ============================= STEP NAV ============================= */
+
+function showStep(n){
+  state.step = n;
+  document.querySelectorAll('.step-section').forEach(s=>s.classList.remove('active'));
+  el('step-'+n).classList.add('active');
+  document.querySelectorAll('.step-btn').forEach(b=>{
+    const bn = parseInt(b.dataset.step,10);
+    b.classList.toggle('active', bn===n);
+    b.classList.toggle('done', bn<n);
+  });
+  if(n===4) renderSummary();
+  window.scrollTo({top:0,behavior:'smooth'});
+  saveState();
+}
+
+/* ============================= STEP 1: CALCULATOR ============================= */
+
+function setUnits(unit){
+  state.units = unit;
+  document.querySelectorAll('#unit-toggle button').forEach(b=>b.classList.toggle('active', b.dataset.unit===unit));
+  const imp = unit==='imperial';
+  el('height-imperial').style.display = imp ? 'block':'none';
+  el('height-metric').style.display = imp ? 'none':'block';
+  el('weight-imperial').style.display = imp ? 'block':'none';
+  el('weight-metric').style.display = imp ? 'none':'block';
+  el('goal-weight-imperial').style.display = imp ? 'block':'none';
+  el('goal-weight-metric').style.display = imp ? 'none':'block';
+  updateRateOptions();
+}
+
+function updateRateOptions(){
+  const goal = el('goal').value;
+  const rateSel = el('rate');
+  rateSel.innerHTML = '';
+  let options;
+  if(goal==='gain'){
+    options = state.units==='imperial'
+      ? [[0.25,'0.25 lb / week (lean, slow)'],[0.5,'0.5 lb / week (standard)']]
+      : [[0.113,'0.1 kg / week (lean, slow)'],[0.227,'0.25 kg / week (standard)']];
+  } else {
+    options = state.units==='imperial'
+      ? [[0.5,'0.5 lb / week (gentle)'],[1,'1 lb / week (standard)'],[1.5,'1.5 lb / week (aggressive)'],[2,'2 lb / week (max recommended)']]
+      : [[0.227,'0.25 kg / week (gentle)'],[0.454,'0.5 kg / week (standard)'],[0.68,'0.75 kg / week (aggressive)'],[0.907,'1 kg / week (max recommended)']];
+  }
+  options.forEach(([val,label])=>{
+    const o = document.createElement('option');
+    o.value = val; o.textContent = label;
+    rateSel.appendChild(o);
+  });
+  if(goal==='lose') rateSel.selectedIndex = 1;
+}
+
+function onGoalChange(){
+  const goal = el('goal').value;
+  el('rate-row').style.display = goal==='maintain' ? 'none' : 'grid';
+  updateRateOptions();
+}
+
+function calculatePlan(){
+  const errBox = el('p1-error');
+  errBox.classList.remove('show');
+
+  const sex = document.querySelector('input[name="sex"]:checked').value;
+  const age = parseFloat(el('age').value);
+  const goal = el('goal').value;
+
+  let heightCm, weightKg, goalWeightKg = null;
+
+  if(state.units==='imperial'){
+    const ft = parseFloat(el('height-ft').value) || 0;
+    const inch = parseFloat(el('height-in').value) || 0;
+    heightCm = (ft*12 + inch) * 2.54;
+    const lb = parseFloat(el('weight-lb').value);
+    weightKg = lb * 0.453592;
+    const goalLb = parseFloat(el('goal-weight-lb').value);
+    if(goalLb) goalWeightKg = goalLb * 0.453592;
+  } else {
+    heightCm = parseFloat(el('height-cm').value);
+    weightKg = parseFloat(el('weight-kg').value);
+    const goalKg = parseFloat(el('goal-weight-kg').value);
+    if(goalKg) goalWeightKg = goalKg;
+  }
+
+  if(!age || age<10 || !heightCm || heightCm<90 || !weightKg || weightKg<25){
+    errBox.textContent = 'Please fill in a valid age, height, and current weight.';
+    errBox.classList.add('show');
+    return;
+  }
+
+  const activity = parseFloat(el('activity').value);
+  const rateLb = goal==='maintain' ? 0 : parseFloat(el('rate').value);
+
+  const bmr = sex==='male'
+    ? 10*weightKg + 6.25*heightCm - 5*age + 5
+    : 10*weightKg + 6.25*heightCm - 5*age - 161;
+
+  const tdee = bmr * activity;
+
+  let target = tdee, dailyDelta = 0, capped = false;
+  if(goal==='lose'){
+    dailyDelta = (rateLb*3500)/7;
+    target = tdee - dailyDelta;
+    const floor = sex==='male' ? 1500 : 1200;
+    if(target < floor){ target = floor; dailyDelta = tdee - target; capped = true; }
+  } else if(goal==='gain'){
+    dailyDelta = (rateLb*3500)/7;
+    target = tdee + dailyDelta;
+  }
+
+  const proteinG = 2.2 * weightKg;
+  const proteinCal = proteinG * 4;
+  const fatCal = target * 0.25;
+  const fatG = fatCal / 9;
+  const carbCal = Math.max(target - proteinCal - fatCal, 0);
+  const carbG = carbCal / 4;
+
+  let weeksToGoal = null;
+  if(goalWeightKg && goal!=='maintain' && rateLb>0){
+    const diffKg = goal==='lose' ? (weightKg - goalWeightKg) : (goalWeightKg - weightKg);
+    if(diffKg > 0){
+      const rateKgPerWeek = rateLb * 0.453592;
+      weeksToGoal = diffKg / rateKgPerWeek;
+    }
+  }
+
+  state.results = {
+    sex, age, goal, heightCm, weightKg, goalWeightKg,
+    bmr, tdee, target, dailyDelta, capped,
+    proteinG, fatG, carbG, weeksToGoal,
+    activityLabel: el('activity').selectedOptions[0].text,
+    rateLb
+  };
+
+  renderResults();
+  el('calorie-override').value = Math.round(target);
+  el('calorie-source-hint').textContent = 'Auto-filled from your Step 1 calculation. You can override it here.';
+  saveState();
+}
+
+function renderResults(){
+  const r = state.results;
+  if(!r) return;
+  el('results-card').classList.add('show');
+  el('r-bmr').textContent = fmt(r.bmr);
+  el('r-tdee').textContent = fmt(r.tdee);
+  el('r-target').textContent = fmt(r.target);
+
+  const deltaLabelEl = el('r-delta-label');
+  const deltaEl = el('r-delta');
+  if(r.goal==='lose'){ deltaLabelEl.textContent='Daily deficit'; deltaEl.textContent = fmt(r.dailyDelta); }
+  else if(r.goal==='gain'){ deltaLabelEl.textContent='Daily surplus'; deltaEl.textContent = fmt(r.dailyDelta); }
+  else { deltaLabelEl.textContent='Daily deficit'; deltaEl.textContent = '0'; }
+
+  const cappedNote = el('r-capped-note');
+  if(r.capped){
+    cappedNote.style.display='block';
+    cappedNote.textContent = `Your requested rate would put you below a safe minimum, so we capped your target at ${fmt(r.target)} kcal/day. Consider a slower rate of loss.`;
+  } else cappedNote.style.display='none';
+
+  const timelineNote = el('r-timeline-note');
+  if(r.weeksToGoal){
+    const weeks = Math.ceil(r.weeksToGoal);
+    const d = new Date();
+    d.setDate(d.getDate() + weeks*7);
+    const dateStr = d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    timelineNote.style.display='block';
+    timelineNote.textContent = `At this rate, you could reach your goal weight in about ${weeks} weeks (around ${dateStr}).`;
+  } else timelineNote.style.display='none';
+
+  const macroCal = r.proteinG*4 + r.fatG*9 + r.carbG*4;
+  const macros = [
+    {label:'Protein', g:r.proteinG, cal:r.proteinG*4, color:'var(--teal)'},
+    {label:'Carbs', g:r.carbG, cal:r.carbG*4, color:'var(--coral)'},
+    {label:'Fat', g:r.fatG, cal:r.fatG*9, color:'#3b7dd8'}
+  ];
+  el('macro-bars').innerHTML = macros.map(m=>`
+    <div class="macro-row">
+      <div class="mlabel">${m.label}</div>
+      <div class="mbar-track"><div class="mbar-fill" style="width:${Math.round(m.cal/macroCal*100)}%;background:${m.color};"></div></div>
+      <div class="mval">${fmt(m.g)} g</div>
+    </div>
+  `).join('');
+}
+
+/* ============================= STEP 2: WORKOUT ============================= */
+
+function renderDayPicker(){
+  el('day-picker').innerHTML = DAYS.map(d=>`
+    <button type="button" class="chip ${state.workout.days.includes(d.key)?'active':''}" onclick="toggleDay('${d.key}')">${d.label.slice(0,3)}</button>
+  `).join('');
+}
+
+function toggleDay(key){
+  const idx = state.workout.days.indexOf(key);
+  if(idx>-1) state.workout.days.splice(idx,1);
+  else state.workout.days.push(key);
+  state.workout.days.sort((a,b)=> DAYS.findIndex(d=>d.key===a) - DAYS.findIndex(d=>d.key===b));
+  renderDayPicker();
+  if(state.workout.mode==='custom') renderCustomEditor();
+  saveState();
+}
+
+function setWorkoutMode(mode){
+  state.workout.mode = mode;
+  el('mode-auto').classList.toggle('active', mode==='auto');
+  el('mode-custom').classList.toggle('active', mode==='custom');
+  el('custom-editor').innerHTML = '';
+  if(mode==='custom') renderCustomEditor();
+  saveState();
+}
+
+function renderCustomEditor(){
+  if(state.workout.days.length===0){
+    el('custom-editor').innerHTML = '<p class="hint">Select at least one day above to customize it.</p>';
+    return;
+  }
+  el('custom-editor').innerHTML = state.workout.days.map(dayKey=>{
+    const dayLabel = DAYS.find(d=>d.key===dayKey).label;
+    const current = getCustomPicks(dayKey);
+    const isRest = current.length===1 && current[0]==='rest';
+    const chips = Object.keys(MUSCLES).map(mk=>`
+      <button type="button" class="chip ${current.includes(mk)?'active':''}" onclick="toggleCustomMuscle('${dayKey}','${mk}')">${MUSCLES[mk].name}</button>
+    `).join('');
+    return `
+      <div class="day-editor">
+        <div class="dtitle">${dayLabel}</div>
+        <div class="chip-group">
+          ${chips}
+          <button type="button" class="chip ${isRest?'rest-active':''}" onclick="setCustomRest('${dayKey}')">Rest Day</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function getCustomPicks(dayKey){
+  if(state.workout.customPicks[dayKey]) return state.workout.customPicks[dayKey];
+  const built = state.workout.assignments[dayKey];
+  if(built && Array.isArray(built.muscles) && built.muscles.length>0) return built.muscles.slice();
+  return [];
+}
+
+function toggleCustomMuscle(dayKey, muscleKey){
+  let arr = getCustomPicks(dayKey).filter(m=>m!=='rest');
+  const idx = arr.indexOf(muscleKey);
+  if(idx>-1) arr.splice(idx,1); else arr.push(muscleKey);
+  state.workout.customPicks[dayKey] = arr;
+  renderCustomEditor();
+  saveState();
+}
+
+function setCustomRest(dayKey){
+  state.workout.customPicks[dayKey] = ['rest'];
+  renderCustomEditor();
+  saveState();
+}
+
+function buildSchedule(){
+  const days = state.workout.days;
+  if(days.length===0){
+    alert('Pick at least one workout day first.');
+    return;
+  }
+
+  if(state.workout.mode==='auto'){
+    const templates = DAY_COUNT_TEMPLATES[days.length] || DAY_COUNT_TEMPLATES[Math.min(days.length,7)];
+    const assignments = {};
+    days.forEach((dayKey,i)=>{
+      const splitName = templates[i % templates.length];
+      assignments[dayKey] = { split: splitName, muscles: SPLIT_MUSCLES[splitName] };
+    });
+    state.workout.assignments = assignments;
+  } else {
+    const assignments = {};
+    days.forEach(dayKey=>{
+      const chosen = getCustomPicks(dayKey).filter(m=>m!=='rest');
+      if(chosen.length===0){
+        assignments[dayKey] = { split:'Rest', muscles:[] };
+      } else {
+        assignments[dayKey] = { split: chosen.map(m=>MUSCLES[m].name).join(' + '), muscles: chosen };
+      }
+    });
+    state.workout.assignments = assignments;
+  }
+
+  renderSchedule();
+  saveState();
+}
+
+function repGuidance(){
+  const goal = state.results ? state.results.goal : 'lose';
+  if(goal==='gain') return '3-4 sets × 6-10 reps, 90-120 sec rest — increase weight over time.';
+  return '3-4 sets × 10-15 reps, 45-75 sec rest — moderate weight, focus on form.';
+}
+
+function renderSchedule(){
+  el('schedule-card').style.display='block';
+  el('schedule-tip').textContent = repGuidance();
+
+  el('schedule-grid').innerHTML = DAYS.map(d=>{
+    const a = state.workout.assignments[d.key];
+    if(!a || a.muscles.length===0){
+      return `<div class="day-card rest"><h4>${d.label}</h4><div class="rest-tag">Rest Day</div></div>`;
+    }
+    const muscleTags = a.muscles.map(mk=>`<span class="muscle-tag">${MUSCLES[mk].name}</span>`).join('');
+    const exerciseList = a.muscles.map(mk=>`
+      <strong style="font-size:.78rem;">${MUSCLES[mk].name}</strong>
+      <ul>${MUSCLES[mk].exercises.slice(0,3).map(ex=>`<li>${ex}</li>`).join('')}</ul>
+    `).join('');
+    return `
+      <div class="day-card">
+        <h4>${d.label}</h4>
+        <div class="focus">${a.split}</div>
+        <div>${muscleTags}</div>
+        ${exerciseList}
+      </div>
+    `;
+  }).join('');
+}
+
+/* ============================= STEP 3: MEAL PLAN ============================= */
+
+function passesFilters(meal, dietType, picky, quick, excluded, relaxQuick, relaxPicky){
+  if(dietType==='vegan' && !meal.tags.includes('vegan')) return false;
+  if(dietType==='vegetarian' && !meal.tags.includes('vegetarian')) return false;
+  if(dietType==='pescatarian' && !(meal.tags.includes('vegetarian')||meal.tags.includes('pescatarian'))) return false;
+
+  const haystack = (meal.name + ' ' + meal.ingredients.join(' ')).toLowerCase();
+  for(const kw of excluded){ if(kw && haystack.includes(kw)) return false; }
+
+  if(picky && !relaxPicky && !meal.picky) return false;
+  if(quick && !relaxQuick && !meal.quick) return false;
+
+  return true;
+}
+
+function scaledMeal(meal, targetCal){
+  const rawScale = targetCal / meal.cal;
+  const scale = clamp(rawScale, 0.6, 2.0);
+  return {
+    ...meal,
+    cal: Math.round(meal.cal*scale),
+    protein: Math.round(meal.protein*scale),
+    scale
+  };
+}
+
+function pickMeal(list, targetCal, dietType, picky, quick, excluded, usedSet, avoidNames){
+  let candidates = list.filter(m=>passesFilters(m,dietType,picky,quick,excluded,false,false));
+  if(candidates.length===0) candidates = list.filter(m=>passesFilters(m,dietType,picky,quick,excluded,true,false));
+  if(candidates.length===0) candidates = list.filter(m=>passesFilters(m,dietType,picky,quick,excluded,true,true));
+  if(candidates.length===0) candidates = list.filter(m=>{
+    if(dietType==='vegan') return m.tags.includes('vegan');
+    if(dietType==='vegetarian') return m.tags.includes('vegetarian');
+    if(dietType==='pescatarian') return m.tags.includes('vegetarian')||m.tags.includes('pescatarian');
+    return true;
+  });
+  if(candidates.length===0) candidates = list.slice();
+
+  candidates = candidates.filter(m=>!avoidNames.has(m.name));
+  if(candidates.length===0) candidates = list.filter(m=>passesFilters(m,dietType,picky,quick,excluded,true,true));
+  if(candidates.length===0) candidates = list.slice();
+
+  candidates.sort((a,b)=> Math.abs(a.cal-targetCal) - Math.abs(b.cal-targetCal));
+  const top = candidates.slice(0, Math.min(5, candidates.length));
+  const fresh = top.filter(m=>!usedSet.has(m.name));
+  const pool = fresh.length ? fresh : top;
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+function generateWeekPlan(){
+  const dietType = el('diet-type').value;
+  const picky = el('picky-eater').checked;
+  const quick = el('quick-only').checked;
+  const mealsPerDay = el('meals-per-day').value;
+  const excluded = el('dislikes').value.toLowerCase().split(',').map(s=>s.trim()).filter(Boolean);
+
+  const overrideVal = parseFloat(el('calorie-override').value);
+  const dailyTarget = overrideVal>0 ? overrideVal : (state.results ? state.results.target : 2000);
+
+  let slots;
+  if(mealsPerDay==='3'){
+    slots = [
+      {key:'breakfast', label:'Breakfast', pct:0.30, list:BREAKFASTS},
+      {key:'lunch', label:'Lunch', pct:0.35, list:LUNCHES},
+      {key:'dinner', label:'Dinner', pct:0.35, list:DINNERS}
+    ];
+  } else {
+    slots = [
+      {key:'breakfast', label:'Breakfast', pct:0.25, list:BREAKFASTS},
+      {key:'snack1', label:'Snack', pct:0.075, list:SNACKS},
+      {key:'lunch', label:'Lunch', pct:0.30, list:LUNCHES},
+      {key:'snack2', label:'Snack', pct:0.075, list:SNACKS},
+      {key:'dinner', label:'Dinner', pct:0.30, list:DINNERS}
+    ];
+  }
+
+  const usedBySlot = {};
+  slots.forEach(s=>usedBySlot[s.key] = new Set());
+
+  const weekPlan = DAYS.map(d=>{
+    const dayUsedNames = new Set();
+    const meals = slots.map(s=>{
+      const targetCal = dailyTarget * s.pct;
+      const meal = pickMeal(s.list, targetCal, dietType, picky, quick, excluded, usedBySlot[s.key], dayUsedNames);
+      usedBySlot[s.key].add(meal.name);
+      dayUsedNames.add(meal.name);
+      return { slotLabel: s.label, ...scaledMeal(meal, targetCal) };
+    });
+    const totalCal = meals.reduce((sum,m)=>sum+m.cal,0);
+    const totalProtein = meals.reduce((sum,m)=>sum+m.protein,0);
+    return { day: d.label, meals, totalCal, totalProtein };
+  });
+
+  state.weekPlan = { weekPlan, dailyTarget, prefs:{dietType,picky,quick,mealsPerDay,excluded} };
+  renderMealPlan();
+  saveState();
+}
+
+function renderMealPlan(){
+  if(!state.weekPlan) return;
+  const { weekPlan, dailyTarget } = state.weekPlan;
+
+  el('mealplan-card').style.display='block';
+  el('mealplan-sub').textContent = `Targeting ~${fmt(dailyTarget)} kcal/day. Tap 🔀 on any meal to swap it out.`;
+
+  el('mealplan-days').innerHTML = weekPlan.map((d,dayIdx)=>`
+    <div class="day-block">
+      <div class="day-block-head">
+        <h4>${d.day}</h4>
+        <div class="totals">${fmt(d.totalCal)} kcal · ${fmt(d.totalProtein)}g protein</div>
+      </div>
+      ${d.meals.map((m,mealIdx)=>`
+        <div class="meal-row">
+          <div class="meal-left">
+            <div>
+              <div class="mslot">${m.slotLabel}</div>
+              <div class="mname">${m.name}</div>
+              <div class="mingr">${m.ingredients.join(', ')}</div>
+              ${Math.abs(m.scale-1)>0.12 ? `<div class="mingr" style="color:var(--coral-dark);font-weight:600;">≈${m.scale.toFixed(1)}x standard portion, to match your calorie target</div>` : ''}
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;">
+            <div class="mnums"><strong>${m.cal} kcal</strong>${m.protein}g protein</div>
+            <button class="swap-btn no-print" title="Swap this meal" onclick="swapMeal(${dayIdx},${mealIdx})">🔀</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+
+  renderGroceryList();
+}
+
+function swapMeal(dayIdx, mealIdx){
+  const { weekPlan, dailyTarget, prefs } = state.weekPlan;
+  const listMap = { breakfast:BREAKFASTS, lunch:LUNCHES, dinner:DINNERS, snack1:SNACKS, snack2:SNACKS };
+  const pctMap = prefs.mealsPerDay==='3'
+    ? { breakfast:0.30, lunch:0.35, dinner:0.35 }
+    : { breakfast:0.25, snack1:0.075, lunch:0.30, snack2:0.075, dinner:0.30 };
+
+  const day = weekPlan[dayIdx];
+  const currentMeal = day.meals[mealIdx];
+  const slotKeyGuess = Object.keys(pctMap)[mealIdx] || 'lunch';
+  const list = listMap[slotKeyGuess] || LUNCHES;
+  const targetCal = dailyTarget * (pctMap[slotKeyGuess] || 0.3);
+
+  const avoid = new Set([currentMeal.name]);
+  const usedSet = new Set();
+  const newMeal = pickMeal(list, targetCal, prefs.dietType, prefs.picky, prefs.quick, prefs.excluded, usedSet, avoid);
+
+  day.meals[mealIdx] = { slotLabel: currentMeal.slotLabel, ...scaledMeal(newMeal, targetCal) };
+  day.totalCal = day.meals.reduce((s,m)=>s+m.cal,0);
+  day.totalProtein = day.meals.reduce((s,m)=>s+m.protein,0);
+
+  renderMealPlan();
+  saveState();
+}
+
+function renderGroceryList(){
+  if(!state.weekPlan) return;
+  const seen = new Map();
+  state.weekPlan.weekPlan.forEach(d=>{
+    d.meals.forEach(m=>{
+      m.ingredients.forEach(ing=>{
+        const k = ing.toLowerCase();
+        if(!seen.has(k)) seen.set(k, ing);
+      });
+    });
+  });
+  const items = Array.from(seen.values()).sort((a,b)=>a.localeCompare(b));
+  el('grocery-card').style.display='block';
+  el('grocery-list').innerHTML = items.map((item,i)=>`
+    <label class="grocery-item"><input type="checkbox" id="gi-${i}"> ${item}</label>
+  `).join('');
+}
+
+/* ============================= STEP 4: SUMMARY ============================= */
+
+function renderSummary(){
+  const hasProfile = !!state.results;
+  const hasWorkout = state.workout.assignments && Object.keys(state.workout.assignments).length>0;
+  const hasMeals = !!state.weekPlan;
+
+  if(!hasProfile && !hasWorkout && !hasMeals){
+    el('summary-content').innerHTML = '<div class="empty-hint" id="summary-empty">Complete steps 1-3 to see your full plan here.</div>';
+    return;
+  }
+
+  let html = '';
+
+  if(hasProfile){
+    const r = state.results;
+    html += `
+      <div class="summary-block">
+        <h3>Your Numbers</h3>
+        <div class="stat-grid">
+          <div class="stat"><div class="label">BMR</div><div class="value">${fmt(r.bmr)}</div><div class="unit">kcal/day</div></div>
+          <div class="stat"><div class="label">Maintenance</div><div class="value">${fmt(r.tdee)}</div><div class="unit">kcal/day</div></div>
+          <div class="stat highlight"><div class="label">Daily Target</div><div class="value">${fmt(r.target)}</div><div class="unit">kcal/day</div></div>
+          <div class="stat"><div class="label">Protein / Carbs / Fat</div><div class="value" style="font-size:1.1rem;">${fmt(r.proteinG)} / ${fmt(r.carbG)} / ${fmt(r.fatG)}</div><div class="unit">grams</div></div>
+        </div>
+        <p style="font-size:.85rem;color:var(--ink-soft);">Goal: <strong>${r.goal==='lose'?'Lose weight':r.goal==='gain'?'Gain muscle':'Maintain weight'}</strong> · Activity: ${r.activityLabel}${r.weeksToGoal?` · Estimated time to goal weight: ~${Math.ceil(r.weeksToGoal)} weeks`:''}</p>
+      </div>
+    `;
+  }
+
+  if(hasWorkout){
+    const rows = DAYS.map(d=>{
+      const a = state.workout.assignments[d.key];
+      if(!a || a.muscles.length===0) return `<tr><td>${d.label}</td><td colspan="2" style="color:var(--ink-faint);font-style:italic;">Rest Day</td></tr>`;
+      return `<tr><td>${d.label}</td><td>${a.split}</td><td>${a.muscles.map(m=>MUSCLES[m].name).join(', ')}</td></tr>`;
+    }).join('');
+    html += `
+      <div class="summary-block">
+        <h3>Weekly Workout Schedule</h3>
+        <table class="summary-table">
+          <thead><tr><th>Day</th><th>Focus</th><th>Muscle Groups</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <p style="font-size:.85rem;color:var(--ink-soft);margin-top:.6rem;">${repGuidance()}</p>
+      </div>
+    `;
+  }
+
+  if(hasMeals){
+    const wp = state.weekPlan.weekPlan;
+    const rows = wp.map(d=>`
+      <tr>
+        <td>${d.day}</td>
+        <td>${d.meals.map(m=>`${m.slotLabel}: ${m.name}`).join('<br>')}</td>
+        <td>${fmt(d.totalCal)} kcal</td>
+      </tr>
+    `).join('');
+    html += `
+      <div class="summary-block">
+        <h3>Weekly Meal Plan</h3>
+        <table class="summary-table">
+          <thead><tr><th>Day</th><th>Meals</th><th>Total</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    `;
+
+    const seen = new Map();
+    wp.forEach(d=>d.meals.forEach(m=>m.ingredients.forEach(ing=>{
+      const k=ing.toLowerCase(); if(!seen.has(k)) seen.set(k,ing);
+    })));
+    const items = Array.from(seen.values()).sort((a,b)=>a.localeCompare(b));
+    html += `
+      <div class="summary-block">
+        <h3>Grocery List</h3>
+        <div class="grocery-list">${items.map(i=>`<div class="grocery-item">${i}</div>`).join('')}</div>
+      </div>
+    `;
+  }
+
+  html += `
+    <div class="summary-block">
+      <h3>Tips to Stick With It</h3>
+      <ul class="tips-list">${ADHERENCE_TIPS.map(t=>`<li>${t}</li>`).join('')}</ul>
+    </div>
+  `;
+
+  el('summary-content').innerHTML = html;
+}
+
+function exportPDF(){
+  showStep(4);
+  setTimeout(()=>window.print(), 150);
+}
+
+/* ============================= RESET ============================= */
+
+function resetAll(){
+  if(!confirm('This will clear your saved plan and start fresh. Continue?')) return;
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+  window.location.reload();
+}
+
+/* ============================= INIT ============================= */
+
+function init(){
+  loadState();
+
+  setUnits(state.units);
+  onGoalChange();
+  renderDayPicker();
+  setWorkoutMode(state.workout.mode);
+
+  if(state.results){
+    document.querySelector(`input[name="sex"][value="${state.results.sex}"]`).checked = true;
+    el('age').value = state.results.age;
+    if(state.units==='imperial'){
+      const totalIn = state.results.heightCm/2.54;
+      el('height-ft').value = Math.floor(totalIn/12);
+      el('height-in').value = Math.round(totalIn%12);
+      el('weight-lb').value = Math.round(state.results.weightKg/0.453592);
+      if(state.results.goalWeightKg) el('goal-weight-lb').value = Math.round(state.results.goalWeightKg/0.453592);
+    } else {
+      el('height-cm').value = Math.round(state.results.heightCm);
+      el('weight-kg').value = Math.round(state.results.weightKg);
+      if(state.results.goalWeightKg) el('goal-weight-kg').value = Math.round(state.results.goalWeightKg);
+    }
+    el('goal').value = state.results.goal;
+    onGoalChange();
+    el('rate').value = state.results.rateLb;
+    renderResults();
+  }
+
+  if(state.workout.assignments && Object.keys(state.workout.assignments).length>0 &&
+     Object.values(state.workout.assignments).some(a=>a.muscles!==undefined && a.split!==undefined)){
+    renderSchedule();
+  }
+
+  if(state.weekPlan){
+    el('diet-type').value = state.weekPlan.prefs.dietType;
+    el('picky-eater').checked = state.weekPlan.prefs.picky;
+    el('quick-only').checked = state.weekPlan.prefs.quick;
+    el('meals-per-day').value = state.weekPlan.prefs.mealsPerDay;
+    el('dislikes').value = state.weekPlan.prefs.excluded.join(', ');
+    el('calorie-override').value = Math.round(state.weekPlan.dailyTarget);
+    renderMealPlan();
+  }
+
+  showStep(state.step || 1);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
